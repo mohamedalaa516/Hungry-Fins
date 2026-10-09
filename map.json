@@ -1,0 +1,786 @@
+[
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            1,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            0,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            2,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            3,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            4,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            5,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            6,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            6,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            7,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            8,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            8,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            9,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            10,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            11,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            12,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            13,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            14,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            16,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            15,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            17,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            19,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            18,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            20,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            21,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            22,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            23,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            25,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            24,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            26,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            27,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            29,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            28,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            30,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            31,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            32,
+            3
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            32,
+            4
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            32,
+            5
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            32,
+            6
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            32,
+            7
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            32,
+            9
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            32,
+            8
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            32,
+            10
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            32,
+            12
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            32,
+            11
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            32,
+            13
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            32,
+            15
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            32,
+            17
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            32,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            32,
+            16
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            32,
+            14
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            31,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            29,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            30,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            28,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            27,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            26,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            25,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            24,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            23,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            22,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            20,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            19,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            21,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            18,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            17,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            16,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            14,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            15,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            13,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            12,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            10,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            10,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            11,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            10,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            9,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            7,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            6,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            8,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            4,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            3,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            5,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            2,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            0,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            1,
+            18
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            0,
+            17
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            0,
+            16
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            0,
+            15
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            0,
+            14
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            0,
+            13
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            0,
+            11
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            0,
+            12
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            0,
+            9
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            0,
+            10
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            0,
+            7
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            0,
+            8
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            0,
+            5
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            0,
+            6
+        ]
+    },
+    {
+        "type": "collisions",
+        "variation": 3,
+        "pos": [
+            0,
+            4
+        ]
+    }
+]
