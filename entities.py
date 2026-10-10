@@ -1,13 +1,11 @@
 import pygame
+from pygame.mixer import find_channel
+import config
 from utilities.animation import Animation
+import random
 
 
 class EntityPhysics:
-    def __init__(self, surface, pos) -> None:
-        pass
-
-
-class Player:
     def __init__(self, game, frames, pos) -> None:
         self.frames = frames
         self.frameDuration = 1
@@ -19,13 +17,69 @@ class Player:
         self.pos = list(pos)
         self.game = game
         self.volicity = [0, 0]
-        self.speed = 3
         self.flip = False
-        self.dir = {"left": False, "right": False, "up": False, "down": False}
-        self.startGame = True
+
+    def update(self):
+        self.animation.update()
+        self.surface = self.animation.getImage()
 
     def get_rect(self):
         return self.surface.get_rect(topleft=(self.pos[0], self.pos[1]))
+
+    def draw(self):
+        flippedSurf = pygame.transform.flip(self.surface, self.flip, False)
+
+        self.game.gameScreen.blit(flippedSurf, self.pos)
+
+
+class Enemy(EntityPhysics):
+    # enemy goes from left to right or reverse
+    def __init__(self, game, frames, pos) -> None:
+        super().__init__(game, frames, pos)
+        self.time = 0.0
+        self.timeDuration = 3
+        if self.pos[0] <= 0:
+            self.speed = 1
+        else:
+            self.speed = -1
+
+        self.flip = self.speed == -1
+        self.alive = True
+        self.gameStart = True
+
+    def update(self):
+        self.time += 1
+        if self.time > self.timeDuration:
+            self.volicity[0] = self.speed
+            self.time = 0
+        self.pos[0] += self.volicity[0]
+        if self.pos[0] > config.GAME_WIDTH + 100 or self.pos[0] < -100:
+            if self.gameStart:
+                self.gameStart = False
+            else:
+                self.alive = False
+        self.pos[1] += self.volicity[1]
+        tilesCollision = self.game.tilesMap.get_collisions()
+        for collision in tilesCollision:
+            rect = self.get_rect()
+            if self.get_rect().colliderect(collision):
+                if self.volicity[1] < 0:
+                    rect.top = collision.bottom
+                self.pos[1] = rect.y
+
+        return super().update()
+
+    def draw(self):
+        if self.alive:
+            return super().draw()
+
+
+class Player(EntityPhysics):
+    def __init__(self, game, frames, pos) -> None:
+        super().__init__(game, frames, pos)
+        self.speed = 3
+        self.dir = {"left": False, "right": False, "up": False, "down": False}
+        self.startGame = True
 
     def handleInput(self):
         key = pygame.key.get_pressed()
@@ -45,8 +99,6 @@ class Player:
             self.dir = {"left": False, "right": False, "up": False, "down": True}
 
     def update(self):
-        self.animation.update()
-        self.surface = self.animation.getImage()
         if self.dir["left"]:
             self.flip = True
         elif self.dir["right"]:
@@ -78,8 +130,4 @@ class Player:
                     elif self.volicity[1] < 0:
                         rect.top = collision.bottom
                     self.pos[1] = rect.y
-
-    def draw(self):
-        flippedSurf = pygame.transform.flip(self.surface, self.flip, False)
-
-        self.game.gameScreen.blit(flippedSurf, self.pos)
+        return super().update()
