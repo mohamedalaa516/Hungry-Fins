@@ -27,6 +27,8 @@ class EntityPhysics:
         return self.surface.get_rect(topleft=(self.pos[0], self.pos[1]))
 
     def draw(self):
+        if config.DEBUG:
+            pygame.draw.rect(self.game.gameScreen, (255, 0, 0), self.get_rect(), 1)
         flippedSurf = pygame.transform.flip(self.surface, self.flip, False)
 
         self.game.gameScreen.blit(flippedSurf, self.pos)
@@ -61,12 +63,15 @@ class Enemy(EntityPhysics):
         self.pos[1] += self.volicity[1]
         tilesCollision = self.game.tilesMap.get_collisions()
         for collision in tilesCollision:
+            if config.DEBUG:
+                pygame.draw.rect(self.game.gameScreen, (255, 255, 0), collision, 1)
             rect = self.get_rect()
             if self.get_rect().colliderect(collision):
                 if self.volicity[1] < 0:
                     rect.top = collision.bottom
+                elif self.volicity[1] > 0:
+                    rect.bottom = collision.top
                 self.pos[1] = rect.y
-
         return super().update()
 
     def draw(self):
