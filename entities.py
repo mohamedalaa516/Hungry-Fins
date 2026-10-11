@@ -6,8 +6,9 @@ import random
 
 
 class EntityPhysics:
-    def __init__(self, game, frames, pos) -> None:
+    def __init__(self, game, frames, pos, level) -> None:
         self.frames = frames
+        self.level = level
         self.frameDuration = 1
         self.frameSpeed = 0.2
         self.animation = Animation(
@@ -36,24 +37,53 @@ class EntityPhysics:
 
 class Enemy(EntityPhysics):
     # enemy goes from left to right or reverse
-    def __init__(self, game, frames, pos) -> None:
-        super().__init__(game, frames, pos)
+    def __init__(self, game, frames, pos, level) -> None:
+        super().__init__(game, frames, pos, level)
         self.time = 0.0
         self.timeDuration = 3
+        self.level = level
         if self.pos[0] <= 0:
             self.speed = 1
         else:
             self.speed = -1
 
+        self.escapeSpeed = 1.5
+        self.dying = False
+
         self.flip = self.speed == -1
         self.alive = True
         self.gameStart = True
 
+    def detectPlayer(self, playerPos):
+        distance = pygame.math.Vector2.distance_to(
+            pygame.Vector2(self.pos), pygame.Vector2(playerPos)
+        )
+        return distance <= 100
+
     def update(self):
+        if not self.dying:
+            self.flip = self.speed < 0
         self.time += 1
         if self.time > self.timeDuration:
             self.volicity[0] = self.speed
             self.time = 0
+
+        if self.detectPlayer(self.game.player.pos):
+            if self.level <= self.game.player.level:
+                if self.game.player.pos[0] > self.pos[0]:
+                    self.speed = -abs(self.escapeSpeed)
+                else:
+                    self.speed = abs(self.escapeSpeed)
+            else:
+                dx = self.game.player.pos[0] - self.pos[0]
+                dy = self.game.player.pos[1] - self.pos[1]
+
+                self.volicity[0] = self.speed if dx > 0 else -self.speed
+                self.volicity[1] = self.speed if dy > 0 else -self.speed
+
+        if self.dying and self.animation.finished:
+            self.alive = False
+
         self.pos[0] += self.volicity[0]
         if self.pos[0] > config.GAME_WIDTH + 100 or self.pos[0] < -100:
             if self.gameStart:
@@ -80,11 +110,14 @@ class Enemy(EntityPhysics):
 
 
 class Player(EntityPhysics):
-    def __init__(self, game, frames, pos) -> None:
-        super().__init__(game, frames, pos)
+    def __init__(self, game, frames, pos, level, sizeToGrow) -> None:
+        super().__init__(game, frames, pos, level)
         self.speed = 3
         self.dir = {"left": False, "right": False, "up": False, "down": False}
         self.startGame = True
+        self.attack = False
+        self.numberOfEating = 8
+        self.sizeToGrow = sizeToGrow
 
     def handleInput(self):
         key = pygame.key.get_pressed()
@@ -103,7 +136,46 @@ class Player(EntityPhysics):
             self.volicity[1] += self.speed
             self.dir = {"left": False, "right": False, "up": False, "down": True}
 
+        if key[pygame.K_SPACE] and not self.attack:
+            self.attack = True
+            self.animation.restart()
+
+    def changeState(self):
+        if self.attack:
+            self.animation.setAnimation(
+                self.game.loader[f"player/{self.game.playerType}/attack"], loop=False
+            )
+            if self.animation.finished:
+                self.attack = False
+        else:
+            self.animation.setAnimation(
+                self.game.loader[f"player/{self.game.playerType}/idle"], loop=True
+            )
+
+    def eat(self):
+        if not self.attack:
+            return
+        for enemy in self.game.enemies[:]:
+            if self.get_rect().colliderect(enemy.get_rect()):
+                if self.level >= enemy.level and not enemy.dying:
+                    enemy.dying = True
+                    enemy.animation.restart()
+                    enemy.animation.setAnimation(self.game.loader["blood"], loop=False)
+                    enemy.volicity = [0, 0]
+                    self.numberOfEating += enemy.level
+
+    def changeSize(self):
+        if self.numberOfEating >= self.sizeToGrow[0]:
+            self.game.playerType = "medium"
+            self.level = 2
+        if self.numberOfEating >= self.sizeToGrow[1]:
+            self.game.playerType = "large"
+            self.level = 3
+
     def update(self):
+        self.changeState()
+        self.eat()
+        self.changeSize()
         if self.dir["left"]:
             self.flip = True
         elif self.dir["right"]:

@@ -27,28 +27,54 @@ class Game:
             "background": pygame.image.load(
                 join("./assets", "decore", "background.png")
             ),
-            "player": sprite_handler(
-                join("./assets", "player", "player_medium.png"),
-                config.PLAYER_ANIMATION_SPEED,
+            "blood": sprite_handler(
+                join("./assets", "Bloodybite.png"), 4, column=False, row=True
+            ),
+            "player/medium/idle": sprite_handler(
+                join("./assets", "player", "player_medium_idle.png"),
+                config.PLAYER_ANIMATION_SIZE,
+            ),
+            "player/medium/attack": sprite_handler(
+                join("./assets", "player", "player_medium_attack.png"),
+                config.PLAYER_ANIMATION_SIZE,
+            ),
+            "player/small/idle": sprite_handler(
+                join("./assets", "player", "player_small_idle.png"),
+                config.PLAYER_ANIMATION_SIZE,
+            ),
+            "player/small/attack": sprite_handler(
+                join("./assets", "player", "player_small_attack.png"),
+                config.PLAYER_ANIMATION_SIZE,
+            ),
+            "player/large/idle": sprite_handler(
+                join("./assets", "player", "player_large_idle.png"),
+                config.PLAYER_ANIMATION_SIZE,
+            ),
+            "player/large/attack": sprite_handler(
+                join("./assets", "player", "player_large_attack.png"),
+                config.PLAYER_ANIMATION_SIZE,
             ),
             "normalFish": sprite_handler(
-                join("./assets", "enemy", "normal_fish.png"),
-                config.ENEMY_ANIMATION_SPEED,
+                join("./assets", "enemy", "normal_fish_idle.png"),
+                config.ENEMY_ANIMATION_SIZE,
             ),
             "smallFish": sprite_handler(
                 join("./assets", "enemy", "small_fish.png"),
-                4,
+                config.ENEMY_ANIMATION_SIZE,
             ),
             "largeFish": sprite_handler(
-                join("./assets", "enemy", "sword_fish.png"),
-                config.ENEMY_ANIMATION_SPEED,
+                join("./assets", "enemy", "sword_fish_idle.png"),
+                config.ENEMY_ANIMATION_SIZE,
             ),
         }
 
+        self.playerType = "small"
         self.player = Player(
             self,
-            self.loader["player"],
+            self.loader[f"player/{self.playerType}/idle"],
             config.PLAYER_START_POS,
+            config.PLAYER_LEVELS[self.playerType],
+            [10, 20],
         )
 
         self.enemies = []
@@ -110,6 +136,7 @@ class Game:
                                 config.ENEMY_SPAWN_Y_MAX,
                             ),
                         ),
+                        level=config.FISH_LEVELS[fishType],
                     )
                 )
 
@@ -117,6 +144,7 @@ class Game:
 
             self.player.update()
             self.camera.update()
+            print(self.player.level, self.player.numberOfEating)
 
             self.gameScreen.blit(
                 self.loader["background"],

@@ -31,3 +31,11 @@ class Animation:
 
     def getImage(self):
         return self.frames[self.currentIndex]
+
+    def restart(self):
+        self.currentIndex = 0
+        self.finished = False
+
+    def setAnimation(self, frames, loop):
+        self.frames = frames
+        self.loop = loop
