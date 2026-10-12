@@ -54,16 +54,24 @@ class Game:
                 join("./assets", "player", "player_large_attack.png"),
                 config.PLAYER_ANIMATION_SIZE,
             ),
-            "normalFish": sprite_handler(
+            "normalFish/idle": sprite_handler(
                 join("./assets", "enemy", "normal_fish_idle.png"),
                 config.ENEMY_ANIMATION_SIZE,
             ),
-            "smallFish": sprite_handler(
+            "smallFish/idle": sprite_handler(
                 join("./assets", "enemy", "small_fish.png"),
                 config.ENEMY_ANIMATION_SIZE,
             ),
-            "largeFish": sprite_handler(
+            "largeFish/idle": sprite_handler(
                 join("./assets", "enemy", "sword_fish_idle.png"),
+                config.ENEMY_ANIMATION_SIZE,
+            ),
+            "normalFish/attack": sprite_handler(
+                join("./assets", "enemy", "normal_fish_attack.png"),
+                config.ENEMY_ANIMATION_SIZE,
+            ),
+            "largeFish/attack": sprite_handler(
+                join("./assets", "enemy", "sword_fish_attack.png"),
                 config.ENEMY_ANIMATION_SIZE,
             ),
         }
@@ -76,6 +84,7 @@ class Game:
             config.PLAYER_LEVELS[self.playerType],
             [10, 20],
         )
+        self.reservationSet = set()
 
         self.enemies = []
         self.timeEnemy = 0
@@ -105,7 +114,8 @@ class Game:
 
             self.player.handleInput()
 
-            self.spawnParticle(self.player)
+            if self.player.alive:
+                self.spawnParticle(self.player)
 
             self.timeEnemy += 1
 
@@ -123,7 +133,7 @@ class Game:
                 self.enemies.append(
                     Enemy(
                         self,
-                        self.loader[fishType],
+                        self.loader[f"{fishType}/idle"],
                         (
                             random.choice(
                                 [
@@ -137,14 +147,15 @@ class Game:
                             ),
                         ),
                         level=config.FISH_LEVELS[fishType],
+                        type=fishType,
                     )
                 )
 
                 self.timeEnemy = 0
 
             self.player.update()
+            print(self.player.level, len(self.reservationSet))
             self.camera.update()
-            print(self.player.level, self.player.numberOfEating)
 
             self.gameScreen.blit(
                 self.loader["background"],

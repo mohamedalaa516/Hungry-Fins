@@ -1,8 +1,6 @@
 import pygame
-from pygame.mixer import find_channel
 import config
 from utilities.animation import Animation
-import random
 
 
 class EntityPhysics:
@@ -19,6 +17,8 @@ class EntityPhysics:
         self.game = game
         self.volicity = [0, 0]
         self.flip = False
+        self.alive = True
+        self.dying = False
 
     def update(self):
         self.animation.update()
@@ -27,62 +27,115 @@ class EntityPhysics:
     def get_rect(self):
         return self.surface.get_rect(topleft=(self.pos[0], self.pos[1]))
 
+    def get_hitbox(self):
+        rect = self.get_rect()
+        return rect.inflate(-rect.width * 0.4, -rect.height * 0.4)
+
     def draw(self):
         if config.DEBUG:
             pygame.draw.rect(self.game.gameScreen, (255, 0, 0), self.get_rect(), 1)
-        flippedSurf = pygame.transform.flip(self.surface, self.flip, False)
 
-        self.game.gameScreen.blit(flippedSurf, self.pos)
+        if self.alive or self.dying:
+            flippedSurf = pygame.transform.flip(self.surface, self.flip, False)
+            self.game.gameScreen.blit(flippedSurf, self.pos)
+        if config.DEBUG:
+            pygame.draw.rect(self.game.gameScreen, (0, 255, 255), self.get_hitbox(), 1)
 
 
 class Enemy(EntityPhysics):
     # enemy goes from left to right or reverse
-    def __init__(self, game, frames, pos, level) -> None:
+    def __init__(self, game, frames, pos, level, type) -> None:
         super().__init__(game, frames, pos, level)
         self.time = 0.0
         self.timeDuration = 3
         self.level = level
         if self.pos[0] <= 0:
-            self.speed = 1
+            self.partrolDirection = 1
         else:
-            self.speed = -1
+            self.partrolDirection = -1
 
-        self.escapeSpeed = 1.5
-        self.dying = False
+        self.escapeSpeed = 2
+        self.speed = 1
 
-        self.flip = self.speed == -1
-        self.alive = True
         self.gameStart = True
+        self.detect = False
 
-    def detectPlayer(self, playerPos):
+        self.type = type
+
+        self.attack = False
+
+    def detectPlayer(self, playerCenter):
         distance = pygame.math.Vector2.distance_to(
-            pygame.Vector2(self.pos), pygame.Vector2(playerPos)
+            pygame.Vector2(self.get_rect().center), pygame.Vector2(playerCenter)
         )
-        return distance <= 100
+        return distance
+
+    def eat(self):
+        if self.attack:
+            self.animation.setAnimation(
+                self.game.loader[f"{self.type}/attack"], loop=False
+            )
+            if self.animation.finished:
+                self.animation.setAnimation(
+                    self.game.loader[f"{self.type}/idle"], loop=True
+                )
+                self.attack = False
 
     def update(self):
-        if not self.dying:
-            self.flip = self.speed < 0
-        self.time += 1
-        if self.time > self.timeDuration:
-            self.volicity[0] = self.speed
-            self.time = 0
+        if self.dying:
+            if self.animation.finished:
+                self.dying = False
+                self.alive = False
+        distance = self.detectPlayer(self.game.player.get_rect().center)
+        can_chase = (
+            self in self.game.reservationSet or len(self.game.reservationSet) < 1
+        )
 
-        if self.detectPlayer(self.game.player.pos):
+        if (
+            distance <= 80
+            and can_chase
+            and not self.game.player.dying
+            and self.game.player.alive
+            and self.game.player.time >= self.game.player.coolDown
+        ):
+            dx = self.game.player.get_rect().centerx - self.get_rect().centerx
+            dy = self.game.player.get_rect().centery - self.get_rect().centery
             if self.level <= self.game.player.level:
-                if self.game.player.pos[0] > self.pos[0]:
-                    self.speed = -abs(self.escapeSpeed)
-                else:
-                    self.speed = abs(self.escapeSpeed)
+                direction = pygame.Vector2(-dx, 0)
+                self.movementSpeed = self.escapeSpeed
             else:
-                dx = self.game.player.pos[0] - self.pos[0]
-                dy = self.game.player.pos[1] - self.pos[1]
+                self.game.reservationSet.add(self)
+                direction = pygame.Vector2(dx, dy)
+                self.movementSpeed = self.speed
 
-                self.volicity[0] = self.speed if dx > 0 else -self.speed
-                self.volicity[1] = self.speed if dy > 0 else -self.speed
+            if direction:
+                direction = direction.normalize()
+                self.volicity[0] = direction.x * self.movementSpeed
+                self.volicity[1] = direction.y * self.movementSpeed
+                self.partrolDirection = 1 if direction.x > 0 else -1
+        else:
+            self.volicity[0] = self.partrolDirection * self.speed
+            self.volicity[1] = 0
+            if self in self.game.reservationSet:
+                self.game.reservationSet.remove(self)
 
-        if self.dying and self.animation.finished:
-            self.alive = False
+        if self.get_hitbox().colliderect(self.game.player.get_hitbox()):
+            if (
+                self.level > self.game.player.level
+                and self.game.player.alive
+                and not self.game.player.dying
+                and self.game.player.time >= self.game.player.coolDown
+            ):
+                self.game.player.dying = True
+                self.game.player.animation.restart()
+                self.game.player.animation.setAnimation(
+                    self.game.loader["blood"], loop=False
+                )
+                self.attack = True
+        self.eat()
+
+        if not self.dying:
+            self.flip = self.volicity[0] < 0
 
         self.pos[0] += self.volicity[0]
         if self.pos[0] > config.GAME_WIDTH + 100 or self.pos[0] < -100:
@@ -92,10 +145,10 @@ class Enemy(EntityPhysics):
                 self.alive = False
         self.pos[1] += self.volicity[1]
         tilesCollision = self.game.tilesMap.get_collisions()
+        rect = self.get_rect()
         for collision in tilesCollision:
             if config.DEBUG:
                 pygame.draw.rect(self.game.gameScreen, (255, 255, 0), collision, 1)
-            rect = self.get_rect()
             if self.get_rect().colliderect(collision):
                 if self.volicity[1] < 0:
                     rect.top = collision.bottom
@@ -103,10 +156,6 @@ class Enemy(EntityPhysics):
                     rect.bottom = collision.top
                 self.pos[1] = rect.y
         return super().update()
-
-    def draw(self):
-        if self.alive:
-            return super().draw()
 
 
 class Player(EntityPhysics):
@@ -118,8 +167,45 @@ class Player(EntityPhysics):
         self.attack = False
         self.numberOfEating = 8
         self.sizeToGrow = sizeToGrow
+        self.tempVolicity = self.volicity
+        self.alive = True
+        self.health = 3
+        self.coolDown = 100
+        self.time = 0.0
+
+    def makeWhite(self, surface):
+        white = surface.copy()
+
+        mask = pygame.mask.from_surface(surface)
+        white.blit(
+            mask.to_surface(setcolor=(255, 255, 255, 255), unsetcolor=(0, 0, 0, 0)),
+            (0, 0),
+        )
+
+        return white
+
+    def respawn(self):
+        if self.health > 0:
+            self.alive = True
+            self.dying = False
+            self.attack = False
+            self.startGame = True
+            self.time = 0
+            self.numberOfEating = 8
+            self.game.playerType = "small"
+            self.level = 1
+
+            self.pos = list(config.PLAYER_START_POS)
+            self.volicity = [0, 0]
+
+            self.animation.restart()
+            self.animation.setAnimation(
+                self.game.loader[f"player/{self.game.playerType}/idle"], loop=True
+            )
 
     def handleInput(self):
+        if not self.alive:
+            return
         key = pygame.key.get_pressed()
         self.volicity = [0, 0]
 
@@ -141,6 +227,13 @@ class Player(EntityPhysics):
             self.animation.restart()
 
     def changeState(self):
+        if self.dying:
+            if self.animation.finished:
+                self.dying = False
+                self.alive = False
+                self.health -= 1
+                self.respawn()
+            return
         if self.attack:
             self.animation.setAnimation(
                 self.game.loader[f"player/{self.game.playerType}/attack"], loop=False
@@ -156,7 +249,7 @@ class Player(EntityPhysics):
         if not self.attack:
             return
         for enemy in self.game.enemies[:]:
-            if self.get_rect().colliderect(enemy.get_rect()):
+            if self.get_hitbox().colliderect(enemy.get_hitbox()):
                 if self.level >= enemy.level and not enemy.dying:
                     enemy.dying = True
                     enemy.animation.restart()
@@ -173,6 +266,8 @@ class Player(EntityPhysics):
             self.level = 3
 
     def update(self):
+        self.time = min(self.time + 1, self.coolDown)
+        print(self.time, self.coolDown)
         self.changeState()
         self.eat()
         self.changeSize()
@@ -208,3 +303,19 @@ class Player(EntityPhysics):
                         rect.top = collision.bottom
                     self.pos[1] = rect.y
         return super().update()
+
+    def draw(self):
+        if not self.alive and not self.dying:
+            return
+
+        if self.time < self.coolDown and int(self.time / 6) % 2 == 0:
+            image = self.makeWhite(self.surface)
+        else:
+            image = self.surface
+
+        flippedSurf = pygame.transform.flip(image, self.flip, False)
+        self.game.gameScreen.blit(flippedSurf, self.pos)
+
+        if config.DEBUG:
+            pygame.draw.rect(self.game.gameScreen, (255, 0, 0), self.get_rect(), 1)
+            pygame.draw.rect(self.game.gameScreen, (0, 255, 255), self.get_hitbox(), 1)
