@@ -1,3 +1,5 @@
+from json import load
+
 import pygame
 import config
 from os.path import join
@@ -7,6 +9,7 @@ from utilities.camera import Camera
 from tilemap import Tiles
 from utilities.particle import Particle
 import random
+from growth_ui import Growth
 
 
 class Game:
@@ -23,59 +26,10 @@ class Game:
         self.clock = pygame.time.Clock()
         self.running = True
 
-        self.loader = {
-            "background": pygame.image.load(
-                join("./assets", "decore", "background.png")
-            ),
-            "blood": sprite_handler(
-                join("./assets", "Bloodybite.png"), 4, column=False, row=True
-            ),
-            "player/medium/idle": sprite_handler(
-                join("./assets", "player", "player_medium_idle.png"),
-                config.PLAYER_ANIMATION_SIZE,
-            ),
-            "player/medium/attack": sprite_handler(
-                join("./assets", "player", "player_medium_attack.png"),
-                config.PLAYER_ANIMATION_SIZE,
-            ),
-            "player/small/idle": sprite_handler(
-                join("./assets", "player", "player_small_idle.png"),
-                config.PLAYER_ANIMATION_SIZE,
-            ),
-            "player/small/attack": sprite_handler(
-                join("./assets", "player", "player_small_attack.png"),
-                config.PLAYER_ANIMATION_SIZE,
-            ),
-            "player/large/idle": sprite_handler(
-                join("./assets", "player", "player_large_idle.png"),
-                config.PLAYER_ANIMATION_SIZE,
-            ),
-            "player/large/attack": sprite_handler(
-                join("./assets", "player", "player_large_attack.png"),
-                config.PLAYER_ANIMATION_SIZE,
-            ),
-            "normalFish/idle": sprite_handler(
-                join("./assets", "enemy", "normal_fish_idle.png"),
-                config.ENEMY_ANIMATION_SIZE,
-            ),
-            "smallFish/idle": sprite_handler(
-                join("./assets", "enemy", "small_fish.png"),
-                config.ENEMY_ANIMATION_SIZE,
-            ),
-            "largeFish/idle": sprite_handler(
-                join("./assets", "enemy", "sword_fish_idle.png"),
-                config.ENEMY_ANIMATION_SIZE,
-            ),
-            "normalFish/attack": sprite_handler(
-                join("./assets", "enemy", "normal_fish_attack.png"),
-                config.ENEMY_ANIMATION_SIZE,
-            ),
-            "largeFish/attack": sprite_handler(
-                join("./assets", "enemy", "sword_fish_attack.png"),
-                config.ENEMY_ANIMATION_SIZE,
-            ),
-        }
+        import loaderTexture
 
+        self.loader = loaderTexture.loader
+        self.ui_loader = loaderTexture.ui_loader
         self.playerType = "small"
         self.player = Player(
             self,
@@ -99,6 +53,15 @@ class Game:
         )
 
         self.tilesMap = Tiles(self)
+        self.growth = Growth(
+            self,
+            3,
+            [
+                self.ui_loader["growthBar/normalFish"],
+                self.ui_loader["growthBar/swordFish"],
+                self.ui_loader["growthBar/normalFish"],
+            ],
+        )
 
         try:
             self.tilesMap.load()
@@ -137,7 +100,7 @@ class Game:
                         (
                             random.choice(
                                 [
-                                    0,
+                                    -50,
                                     config.GAME_WIDTH + config.ENEMY_SPAWN_X_OFFSET,
                                 ]
                             ),
@@ -154,8 +117,8 @@ class Game:
                 self.timeEnemy = 0
 
             self.player.update()
-            print(self.player.level, len(self.reservationSet))
             self.camera.update()
+            self.growth.update()
 
             self.gameScreen.blit(
                 self.loader["background"],
@@ -190,6 +153,7 @@ class Game:
 
             self.screen.blit(scaled, (0, 0))
 
+            self.growth.draw()
             pygame.display.flip()
             self.clock.tick(config.FRAME_RATE)
 

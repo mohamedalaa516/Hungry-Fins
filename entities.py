@@ -29,7 +29,18 @@ class EntityPhysics:
 
     def get_hitbox(self):
         rect = self.get_rect()
-        return rect.inflate(-rect.width * 0.4, -rect.height * 0.4)
+
+        mouthWidth = rect.width * 0.4
+        mouthHeight = rect.height * 0.5
+        mouthOffset = rect.width * 0.1
+
+        if self.flip:
+            x = rect.left - mouthOffset
+        else:
+            x = rect.right - mouthWidth + mouthOffset
+
+        y = rect.centery - mouthHeight / 2
+        return pygame.Rect(x, y, mouthWidth, mouthHeight)
 
     def draw(self):
         if config.DEBUG:
