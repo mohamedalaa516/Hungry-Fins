@@ -176,7 +176,7 @@ class Player(EntityPhysics):
         self.dir = {"left": False, "right": False, "up": False, "down": False}
         self.startGame = True
         self.attack = False
-        self.numberOfEating = 8
+        self.numberOfEating = 24
         self.sizeToGrow = sizeToGrow
         self.tempVolicity = self.volicity
         self.alive = True
@@ -277,6 +277,8 @@ class Player(EntityPhysics):
         if self.numberOfEating >= self.sizeToGrow[1]:
             self.game.playerType = "large"
             self.level = 3
+        if self.numberOfEating >= self.sizeToGrow[2]:
+            self.game.win = True
 
     def update(self):
         self.time = min(self.time + 1, self.coolDown)

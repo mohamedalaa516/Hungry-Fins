@@ -11,12 +11,12 @@ from utilities.particle import Particle
 import random
 from growth_ui import Growth
 from score_ui import Score
+from result_ui import ResultScreen
 
 
 class Game:
     def __init__(self) -> None:
         pygame.init()
-
         pygame.display.set_caption(config.WINDOW_TITLE)
 
         self.screen = pygame.display.set_mode(
@@ -37,8 +37,9 @@ class Game:
             self.loader[f"player/{self.playerType}/idle"],
             config.PLAYER_START_POS,
             config.PLAYER_LEVELS[self.playerType],
-            [10, 20],
+            [10, 20, 30],
         )
+        self.win = False
         self.reservationSet = set()
 
         self.enemies = []
@@ -60,10 +61,11 @@ class Game:
             [
                 self.ui_loader["growthBar/normalFish"],
                 self.ui_loader["growthBar/swordFish"],
-                self.ui_loader["growthBar/normalFish"],
+                self.ui_loader["growthBar/win"],
             ],
         )
         self.score = Score(self)
+        self.resultScreen = ResultScreen(self, ["score", "numberOfEating"])
 
         try:
             self.tilesMap.load()
@@ -76,7 +78,6 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
-
             self.player.handleInput()
 
             if self.player.alive:
@@ -122,6 +123,7 @@ class Game:
             self.camera.update()
             self.growth.update()
             self.score.update()
+            self.resultScreen.update()
 
             self.gameScreen.blit(
                 self.loader["background"],
@@ -148,6 +150,8 @@ class Game:
                     self.particles.remove(particle)
 
             view = self.gameScreen.subsurface(self.camera.camera)
+            if self.resultScreen.visible:
+                self.gameScreen.blit(self.resultScreen.overlay, (0, 0))
 
             scaled = pygame.transform.scale(
                 view,
@@ -158,6 +162,7 @@ class Game:
 
             self.growth.draw()
             self.score.draw()
+            self.resultScreen.draw()
             pygame.display.flip()
             self.clock.tick(config.FRAME_RATE)
 

@@ -32,7 +32,11 @@ class Growth:
             self.progressMap = {
                 0: 1,
                 1: 1,
-                2: 1,
+                2: min(
+                    (numberOfEating - sizeToGrowth[1])
+                    / (sizeToGrowth[2] - sizeToGrowth[1]),
+                    1,
+                ),
             }
 
     def draw(self):

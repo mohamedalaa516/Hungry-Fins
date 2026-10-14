@@ -65,6 +65,9 @@ ui_loader = {
     "growthBar/swordFish": pygame.image.load(
         join("assets", "Ui", "growthBar_swordFish.png")
     ),
+    "growthBar/win": pygame.image.load(join("assets", "Ui", "growthBar_win.png")),
     "scoreBar": pygame.image.load(join("assets", "Ui", "score.png")),
     "scoreBar/multi": pygame.image.load(join("assets", "Ui", "score_multi.png")),
+    "result": pygame.image.load(join("assets", "Ui", "result.png")),
+    "result/component": pygame.image.load(join("assets", "Ui", "result_score.png")),
 }
