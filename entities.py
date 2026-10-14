@@ -81,22 +81,11 @@ class Enemy(EntityPhysics):
         )
         return distance
 
-    def eat(self):
-        if self.attack:
-            self.animation.setAnimation(
-                self.game.loader[f"{self.type}/attack"], loop=False
-            )
-            if self.animation.finished:
-                self.animation.setAnimation(
-                    self.game.loader[f"{self.type}/idle"], loop=True
-                )
-                self.attack = False
+    def isFullyOnScreen(self):
+        rect = self.get_rect()
+        return rect.left >= 20 and rect.right <= self.game.gameScreen.get_width() - 20
 
-    def update(self):
-        if self.dying:
-            if self.animation.finished:
-                self.dying = False
-                self.alive = False
+    def followPlayer(self):
         distance = self.detectPlayer(self.game.player.get_rect().center)
         can_chase = (
             self in self.game.reservationSet or len(self.game.reservationSet) < 1
@@ -119,7 +108,7 @@ class Enemy(EntityPhysics):
                 direction = pygame.Vector2(dx, dy)
                 self.movementSpeed = self.speed
 
-            if direction:
+            if direction and self.isFullyOnScreen():
                 direction = direction.normalize()
                 self.volicity[0] = direction.x * self.movementSpeed
                 self.volicity[1] = direction.y * self.movementSpeed
@@ -130,6 +119,18 @@ class Enemy(EntityPhysics):
             if self in self.game.reservationSet:
                 self.game.reservationSet.remove(self)
 
+    def changeState(self):
+        if self.attack:
+            self.animation.setAnimation(
+                self.game.loader[f"{self.type}/attack"], loop=False
+            )
+            if self.animation.finished:
+                self.animation.setAnimation(
+                    self.game.loader[f"{self.type}/idle"], loop=True
+                )
+                self.attack = False
+
+    def attackPlayer(self):
         if self.get_hitbox().colliderect(self.game.player.get_hitbox()):
             if (
                 self.level > self.game.player.level
@@ -137,13 +138,25 @@ class Enemy(EntityPhysics):
                 and not self.game.player.dying
                 and self.game.player.time >= self.game.player.coolDown
             ):
-                self.game.player.dying = True
-                self.game.player.animation.restart()
-                self.game.player.animation.setAnimation(
-                    self.game.loader["blood"], loop=False
-                )
+                self.game.player.die()
                 self.attack = True
-        self.eat()
+
+    def die(self):
+        self.dying = True
+        self.animation.restart()
+        self.animation.setAnimation(self.game.loader["blood"], loop=False)
+        self.volicity = [0, 0]
+
+    def update(self):
+        if not self.alive:
+            return
+        if self.dying and self.animation.finished:
+            self.dying = False
+            self.alive = False
+            return super().update()
+        self.followPlayer()
+        self.attackPlayer()
+        self.changeState()
 
         if not self.dying:
             self.flip = self.volicity[0] < 0
@@ -160,11 +173,11 @@ class Enemy(EntityPhysics):
         for collision in tilesCollision:
             if config.DEBUG:
                 pygame.draw.rect(self.game.gameScreen, (255, 255, 0), collision, 1)
-            if self.get_rect().colliderect(collision):
-                if self.volicity[1] < 0:
-                    rect.top = collision.bottom
-                elif self.volicity[1] > 0:
+            if rect.colliderect(collision):
+                if self.volicity[1] > 0:
                     rect.bottom = collision.top
+                elif self.volicity[1] < 0:
+                    rect.top = collision.bottom
                 self.pos[1] = rect.y
         return super().update()
 
@@ -176,7 +189,7 @@ class Player(EntityPhysics):
         self.dir = {"left": False, "right": False, "up": False, "down": False}
         self.startGame = True
         self.attack = False
-        self.numberOfEating = 24
+        self.numberOfEating = 5
         self.sizeToGrow = sizeToGrow
         self.tempVolicity = self.volicity
         self.alive = True
@@ -201,6 +214,7 @@ class Player(EntityPhysics):
             self.alive = True
             self.dying = False
             self.attack = False
+            self.eaten = False
             self.startGame = True
             self.time = 0
             self.numberOfEating = 8
@@ -257,18 +271,21 @@ class Player(EntityPhysics):
                 self.game.loader[f"player/{self.game.playerType}/idle"], loop=True
             )
 
-    def eat(self):
+    def attackEnemy(self):
         if not self.attack:
             return
         for enemy in self.game.enemies[:]:
             if self.get_hitbox().colliderect(enemy.get_hitbox()):
                 if self.level >= enemy.level and not enemy.dying:
                     self.score += config.FISH_POINTS[enemy.type]
-                    enemy.dying = True
-                    enemy.animation.restart()
-                    enemy.animation.setAnimation(self.game.loader["blood"], loop=False)
-                    enemy.volicity = [0, 0]
                     self.numberOfEating += enemy.level
+                    enemy.die()
+                    self.eaten = False
+
+    def die(self):
+        self.dying = True
+        self.animation.restart()
+        self.animation.setAnimation(self.game.loader["blood"], loop=False)
 
     def changeSize(self):
         if self.numberOfEating >= self.sizeToGrow[0]:
@@ -283,7 +300,7 @@ class Player(EntityPhysics):
     def update(self):
         self.time = min(self.time + 1, self.coolDown)
         self.changeState()
-        self.eat()
+        self.attackEnemy()
         self.changeSize()
         if self.dir["left"]:
             self.flip = True
