@@ -10,6 +10,7 @@ from tilemap import Tiles
 from utilities.particle import Particle
 import random
 from growth_ui import Growth
+from score_ui import Score
 
 
 class Game:
@@ -62,6 +63,7 @@ class Game:
                 self.ui_loader["growthBar/normalFish"],
             ],
         )
+        self.score = Score(self)
 
         try:
             self.tilesMap.load()
@@ -84,7 +86,7 @@ class Game:
 
             if self.timeEnemy >= self.timeRepwanEnemy:
                 fishType = random.choices(
-                    ["smallFish", "normalFish", "largeFish"],
+                    ["smallFish", "normalFish", "swordFish"],
                     weights=[
                         config.SMALL_FISH_WEIGHT,
                         config.NORMAL_FISH_WEIGHT,
@@ -119,6 +121,7 @@ class Game:
             self.player.update()
             self.camera.update()
             self.growth.update()
+            self.score.update()
 
             self.gameScreen.blit(
                 self.loader["background"],
@@ -154,6 +157,7 @@ class Game:
             self.screen.blit(scaled, (0, 0))
 
             self.growth.draw()
+            self.score.draw()
             pygame.display.flip()
             self.clock.tick(config.FRAME_RATE)
 

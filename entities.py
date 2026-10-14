@@ -183,6 +183,7 @@ class Player(EntityPhysics):
         self.health = 3
         self.coolDown = 100
         self.time = 0.0
+        self.score = 0
 
     def makeWhite(self, surface):
         white = surface.copy()
@@ -262,6 +263,7 @@ class Player(EntityPhysics):
         for enemy in self.game.enemies[:]:
             if self.get_hitbox().colliderect(enemy.get_hitbox()):
                 if self.level >= enemy.level and not enemy.dying:
+                    self.score += config.FISH_POINTS[enemy.type]
                     enemy.dying = True
                     enemy.animation.restart()
                     enemy.animation.setAnimation(self.game.loader["blood"], loop=False)
@@ -278,7 +280,6 @@ class Player(EntityPhysics):
 
     def update(self):
         self.time = min(self.time + 1, self.coolDown)
-        print(self.time, self.coolDown)
         self.changeState()
         self.eat()
         self.changeSize()

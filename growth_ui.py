@@ -1,4 +1,5 @@
 import pygame
+from utilities.ui_helper import scaleImage
 
 
 class Growth:
@@ -37,9 +38,9 @@ class Growth:
     def draw(self):
         bar = self.game.ui_loader["growthBar"]
         progress = self.game.ui_loader["growthBar/progress"]
-        scaledBar = self.scaleImage(bar)
-        scaledProgress = self.scaleImage(progress)
-        scaledFishs = [self.scaleImage(fish) for fish in self.fishs]
+        scaledBar = scaleImage(bar)
+        scaledProgress = scaleImage(progress)
+        scaledFishs = [scaleImage(fish) for fish in self.fishs]
 
         for i in range(self.numberOfBars):
             x = i * scaledBar.get_width()
@@ -72,12 +73,6 @@ class Growth:
             )
 
             self.game.screen.blit(scaledFishs[i], (fishX, fishY))
-
-    def scaleImage(self, image, scale=2):
-        return pygame.transform.scale(
-            image,
-            (image.get_width() * scale, image.get_height() * scale),
-        )
 
     def posImageRlationToBar(self, barX, scaledBar, image, x=True, y=False):
         if x:

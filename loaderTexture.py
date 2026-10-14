@@ -40,7 +40,7 @@ loader = {
         join("./assets", "enemy", "small_fish.png"),
         config.ENEMY_ANIMATION_SIZE,
     ),
-    "largeFish/idle": sprite_handler(
+    "swordFish/idle": sprite_handler(
         join("./assets", "enemy", "sword_fish_idle.png"),
         config.ENEMY_ANIMATION_SIZE,
     ),
@@ -48,7 +48,7 @@ loader = {
         join("./assets", "enemy", "normal_fish_attack.png"),
         config.ENEMY_ANIMATION_SIZE,
     ),
-    "largeFish/attack": sprite_handler(
+    "swordFish/attack": sprite_handler(
         join("./assets", "enemy", "sword_fish_attack.png"),
         config.ENEMY_ANIMATION_SIZE,
     ),
@@ -65,4 +65,6 @@ ui_loader = {
     "growthBar/swordFish": pygame.image.load(
         join("assets", "Ui", "growthBar_swordFish.png")
     ),
+    "scoreBar": pygame.image.load(join("assets", "Ui", "score.png")),
+    "scoreBar/multi": pygame.image.load(join("assets", "Ui", "score_multi.png")),
 }
