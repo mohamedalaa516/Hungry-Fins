@@ -74,4 +74,11 @@ ui_loader = {
     "button/small/clicked": pygame.image.load(
         join("assets", "Ui", "button_small_clicked.png")
     ),
+    "healthBar": pygame.image.load(join("assets", "Ui", "healthBar.png")),
+    "healthBar/full": pygame.image.load(
+        join("assets", "Ui", "healthBar_heart_full.png")
+    ),
+    "healthBar/empty": pygame.image.load(
+        join("assets", "Ui", "healthBar_heart_empty.png")
+    ),
 }
