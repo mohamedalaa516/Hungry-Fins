@@ -1,4 +1,5 @@
 import json
+from main_ui import MainMenu
 import pygame
 import config
 from os.path import join
@@ -13,15 +14,9 @@ from spawners.particle_spawaner import spawnParticle
 
 
 class Game:
-    def __init__(self) -> None:
-        pygame.init()
-        pygame.display.set_caption(config.WINDOW_TITLE)
-
-        self.screen = pygame.display.set_mode(
-            (config.SCREEN_WIDTH, config.SCREEN_HEIGHT)
-        )
+    def __init__(self, screen) -> None:
+        self.screen = screen
         self.gameScreen = pygame.Surface((config.GAME_WIDTH, config.GAME_HEIGHT))
-
         self.clock = pygame.time.Clock()
         self.running = True
 
@@ -88,9 +83,9 @@ class Game:
             self.timeEnemy += 1
 
             if self.timeEnemy >= self.levelConfig["spawnInterval"]:
-                fishType = choiceTypeFish(game)
+                fishType = choiceTypeFish(self)
                 if fishType is not None:
-                    createEnemies(game, fishType)
+                    createEnemies(self, fishType)
                     self.timeEnemy = 0
 
             self.camera.update()
@@ -154,5 +149,12 @@ class Game:
         print("Game restarted!")
 
 
-game = Game()
-game.run()
+if __name__ == "__main__":
+    pygame.init()
+    pygame.display.set_caption(config.WINDOW_TITLE)
+    screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
+    menu = MainMenu(screen)
+    menu.run()
+
+    if menu.startGame:
+        Game(screen).run()

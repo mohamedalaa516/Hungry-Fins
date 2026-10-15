@@ -81,4 +81,12 @@ ui_loader = {
     "healthBar/empty": pygame.image.load(
         join("assets", "Ui", "healthBar_heart_empty.png")
     ),
+    "mainUi/layer1": pygame.image.load(join("assets", "Ui", "main_layer_1.png")),
+    "mainUi/layer2": sprite_handler(
+        join("assets", "Ui", "main_layer_2.png"), 7, column=False, row=True
+    ),
+    "mainUi/title/idle": sprite_handler(join("assets", "Ui", "main_title_idle.png"), 6),
+    "mainUi/title/click": sprite_handler(
+        join("assets", "Ui", "main_title_click.png"), 6
+    ),
 }
