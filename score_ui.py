@@ -10,14 +10,15 @@ class Score:
         self.game = game
         self.font = pygame.font.Font(join("assets", "Fonts", "yoster.ttf"), 34)
         self.points = 0
+        self.color = (247, 150, 23)
         # A dark purple with a grayish undertone.
-        self.scoreText = self.font.render(f"{self.points}", True, (46, 34, 47))
-        self.multiText = self.font.render("1x", True, (46, 34, 47))
+        self.scoreText = self.font.render(f"{self.points}", True, self.color)
+        self.multiText = self.font.render("1x", True, self.color)
         self.offsetY = 10
 
     def update(self):
         self.points = self.game.player.score
-        self.scoreText = self.font.render(f"{self.points}", True, (46, 34, 47))
+        self.scoreText = self.font.render(f"{self.points}", True, self.color)
 
     def draw(self):
         scoreBar = self.game.ui_loader["scoreBar"]

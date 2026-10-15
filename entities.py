@@ -65,13 +65,12 @@ class Enemy(EntityPhysics):
         else:
             self.partrolDirection = -1
 
-        self.escapeSpeed = 2
-        self.speed = 1
+        self.type = type
+        self.escapeSpeed = config.FISH_ESCAPED[self.type]
+        self.speed = config.FISH_SPEED[self.type]
 
         self.gameStart = True
         self.detect = False
-
-        self.type = type
 
         self.attack = False
 
@@ -120,15 +119,21 @@ class Enemy(EntityPhysics):
                 self.game.reservationSet.remove(self)
 
     def changeState(self):
+        if self.dying:
+            self.animation.setAnimation(self.game.loader["blood"], loop=False)
+            return
         if self.attack:
             self.animation.setAnimation(
-                self.game.loader[f"{self.type}/attack"], loop=False
+                self.game.loader[f"{self.type}/attack"], loop=False, speed=0.1
             )
             if self.animation.finished:
-                self.animation.setAnimation(
-                    self.game.loader[f"{self.type}/idle"], loop=True
-                )
                 self.attack = False
+            return
+
+        else:
+            self.animation.setAnimation(
+                self.game.loader[f"{self.type}/idle"], loop=True
+            )
 
     def attackPlayer(self):
         if self.get_hitbox().colliderect(self.game.player.get_hitbox()):
@@ -139,12 +144,12 @@ class Enemy(EntityPhysics):
                 and self.game.player.time >= self.game.player.coolDown
             ):
                 self.game.player.die()
+                self.animation.restart()
                 self.attack = True
 
     def die(self):
         self.dying = True
         self.animation.restart()
-        self.animation.setAnimation(self.game.loader["blood"], loop=False)
         self.volicity = [0, 0]
 
     def update(self):

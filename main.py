@@ -78,8 +78,9 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
-            self.player.handleInput()
+                self.resultScreen.handleInput(event)
 
+            self.player.handleInput()
             if self.player.alive:
                 self.spawnParticle(self.player)
 
@@ -119,10 +120,14 @@ class Game:
 
                 self.timeEnemy = 0
 
-            self.player.update()
             self.camera.update()
             self.growth.update()
             self.score.update()
+            if self.win or self.player.health <= 0:
+                self.resultScreen.visible = True
+            else:
+                self.player.update()
+
             self.resultScreen.update()
 
             self.gameScreen.blit(
@@ -222,6 +227,44 @@ class Game:
                 speed,
             )
         )
+
+    def restart(self):
+        # Reset player
+        self.playerType = "small"
+        self.player = Player(
+            self,
+            self.loader[f"player/{self.playerType}/idle"],
+            config.PLAYER_START_POS,
+            config.PLAYER_LEVELS[self.playerType],
+            [10, 20, 30],
+        )
+
+        # Reset game state
+        self.win = False
+        self.reservationSet.clear()
+
+        # Remove old enemies and particles
+        self.enemies.clear()
+        self.particles.clear()
+
+        # Reset enemy spawning
+        self.timeEnemy = 0
+
+        # Reset UI components
+        self.growth = Growth(
+            self,
+            3,
+            [
+                self.ui_loader["growthBar/normalFish"],
+                self.ui_loader["growthBar/swordFish"],
+                self.ui_loader["growthBar/win"],
+            ],
+        )
+
+        self.score = Score(self)
+        self.resultScreen = ResultScreen(self, ["score", "numberOfEating"])
+
+        print("Game restarted!")
 
 
 game = Game()

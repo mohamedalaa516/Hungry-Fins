@@ -36,6 +36,7 @@ class Animation:
         self.currentIndex = 0
         self.finished = False
 
-    def setAnimation(self, frames, loop):
+    def setAnimation(self, frames, loop, speed=0.2):
         self.frames = frames
         self.loop = loop
+        self.speed = speed

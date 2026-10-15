@@ -70,4 +70,8 @@ ui_loader = {
     "scoreBar/multi": pygame.image.load(join("assets", "Ui", "score_multi.png")),
     "result": pygame.image.load(join("assets", "Ui", "result.png")),
     "result/component": pygame.image.load(join("assets", "Ui", "result_score.png")),
+    "button/small": pygame.image.load(join("assets", "Ui", "button_small.png")),
+    "button/small/clicked": pygame.image.load(
+        join("assets", "Ui", "button_small_clicked.png")
+    ),
 }

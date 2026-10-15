@@ -1,6 +1,7 @@
 import pygame
 from os.path import join
 from utilities.ui_helper import scaleImage
+from utilities.button import Button
 
 
 class ResultScreen:
@@ -16,7 +17,7 @@ class ResultScreen:
         self.overlay.fill((0, 0, 0, 160))
 
         self.fontMinSize = 34
-        self.fontSize = 150
+        self.fontSize = 120
         self.currentItemIndex = 0
 
         self.fontString = pygame.font.Font(
@@ -32,10 +33,27 @@ class ResultScreen:
             self.game.ui_loader["result/component"], scale=3
         )
 
-    def update(self):
-        if self.game.win or self.game.player.health <= 0:
-            self.visible = True
+        self.resultX = (
+            self.game.screen.get_width() - self.result_image.get_width()
+        ) // 2
+        self.resultY = (
+            self.game.screen.get_height() - self.result_image.get_height()
+        ) // 2
+        self.result_rect = self.result_image.get_rect(
+            topleft=(self.resultX, self.resultY)
+        )
+        self.button = Button(
+            self.game.screen,
+            self.game.ui_loader["button/small"],
+            self.game.ui_loader["button/small/clicked"],
+            "retry",
+            self.result_rect,
+            "bottomleft",
+            [15, -55],
+        )
+        self.buttonPressed = False
 
+    def update(self):
         if self.visible:
             if self.fontSize > self.fontMinSize:
                 self.fontSize -= 3
@@ -48,17 +66,19 @@ class ResultScreen:
                 join("assets", "Fonts", "yoster.ttf"), self.fontSize
             )
 
+    def handleInput(self, event):
+        if not self.visible:
+            return
+        if self.button.handle_input(event):
+            print("Retry action!")
+            self.game.restart()
+
     def draw(self):
         if not self.visible:
             return
 
-        screen = self.game.screen
-
-        resultX = (screen.get_width() - self.result_image.get_width()) // 2
-        resultY = (screen.get_height() - self.result_image.get_height()) // 2
-
-        screen.blit(self.result_image, (resultX, resultY))
-
+        self.game.screen.blit(self.result_image, self.result_rect)
+        self.button.draw()
         for i, item in enumerate(self.items):
             if i > self.currentItemIndex:
                 continue
@@ -76,17 +96,19 @@ class ResultScreen:
                 itemNumber = self.fontString.render(
                     str(self.value), True, self.text_color
                 )
-            componentX = resultX + 30
-            componentY = resultY + 60 + i * (self.component_image.get_height() + 10)
+            componentX = self.resultX + 30
+            componentY = (
+                self.resultY + 60 + i * (self.component_image.get_height() + 10)
+            )
 
-            screen.blit(self.component_image, (componentX, componentY))
+            self.game.screen.blit(self.component_image, (componentX, componentY))
             numberRect = itemNumber.get_rect(
                 center=(
                     componentX + self.component_image.get_width() // 2,
                     componentY + self.component_image.get_height() // 2,
                 )
             )
-            screen.blit(itemNumber, numberRect)
+            self.game.screen.blit(itemNumber, numberRect)
 
             textRect = itemText.get_rect(
                 midleft=(
@@ -94,4 +116,4 @@ class ResultScreen:
                     componentY + self.component_image.get_height() // 2,
                 )
             )
-            screen.blit(itemText, textRect)
+            self.game.screen.blit(itemText, textRect)
