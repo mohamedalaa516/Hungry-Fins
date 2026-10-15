@@ -1,0 +1,13 @@
+{
+  "growthMeter": [10, 20, 30],
+  "growthInterval": 3,
+  "max_enemies": 12,
+  "max_small_fish": 7,
+  "max_normal_fish": 4,
+  "max_sword_fish": 1,
+  "spawnInterval": 65,
+  "typeEnemies": ["smallFish", "normalFish", "swordFish"],
+  "SMALL_FISH_WEIGHT": 75,
+  "NORMAL_FISH_WEIGHT": 23,
+  "LARGE_FISH_WEIGHT": 2
+}

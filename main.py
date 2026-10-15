@@ -1,17 +1,15 @@
-from json import load
-
+import json
 import pygame
 import config
 from os.path import join
-from utilities.filehandler import sprite_handler
-from entities import Player, Enemy
+from entities import Player
 from utilities.camera import Camera
 from tilemap import Tiles
-from utilities.particle import Particle
-import random
 from growth_ui import Growth
 from score_ui import Score
 from result_ui import ResultScreen
+from spawners.enemy_spawaner import createEnemies, choiceTypeFish
+from spawners.particle_spawaner import spawnParticle
 
 
 class Game:
@@ -31,20 +29,24 @@ class Game:
 
         self.loader = loaderTexture.loader
         self.ui_loader = loaderTexture.ui_loader
-        self.playerType = "small"
+
+        # load levels json
+        with open(join("levels", "level2.json"), "r") as file:
+            self.levelConfig = json.load(file)
+        self.loadLevel()
+        self.timeEnemy = 0.0
+
+    def loadLevel(self):
         self.player = Player(
             self,
-            self.loader[f"player/{self.playerType}/idle"],
+            self.loader[f"player/{config.PLAYER_TYPE}/idle"],
             config.PLAYER_START_POS,
-            config.PLAYER_LEVELS[self.playerType],
-            [10, 20, 30],
+            config.PLAYER_LEVELS[config.PLAYER_TYPE],
+            self.levelConfig["growthMeter"],
         )
         self.win = False
         self.reservationSet = set()
-
         self.enemies = []
-        self.timeEnemy = 0
-        self.timeRepwanEnemy = 50
 
         self.particles = []
 
@@ -53,14 +55,13 @@ class Game:
             config.GAME_HEIGHT // config.CAMERA_ZOOM,
             self,
         )
-
         self.tilesMap = Tiles(self)
         self.growth = Growth(
             self,
-            3,
+            self.levelConfig["growthInterval"],
             [
-                self.ui_loader["growthBar/normalFish"],
-                self.ui_loader["growthBar/swordFish"],
+                self.ui_loader[f"growthBar/{self.levelConfig['typeEnemies'][1]}"],
+                self.ui_loader[f"growthBar/{self.levelConfig['typeEnemies'][2]}"],
                 self.ui_loader["growthBar/win"],
             ],
         )
@@ -82,43 +83,15 @@ class Game:
 
             self.player.handleInput()
             if self.player.alive:
-                self.spawnParticle(self.player)
+                spawnParticle(self, self.player, self.particles)
 
             self.timeEnemy += 1
 
-            if self.timeEnemy >= self.timeRepwanEnemy:
-                fishType = random.choices(
-                    ["smallFish", "normalFish", "swordFish"],
-                    weights=[
-                        config.SMALL_FISH_WEIGHT,
-                        config.NORMAL_FISH_WEIGHT,
-                        config.LARGE_FISH_WEIGHT,
-                    ],
-                    k=1,
-                )[0]
-
-                self.enemies.append(
-                    Enemy(
-                        self,
-                        self.loader[f"{fishType}/idle"],
-                        (
-                            random.choice(
-                                [
-                                    -50,
-                                    config.GAME_WIDTH + config.ENEMY_SPAWN_X_OFFSET,
-                                ]
-                            ),
-                            random.randint(
-                                80,
-                                config.ENEMY_SPAWN_Y_MAX,
-                            ),
-                        ),
-                        level=config.FISH_LEVELS[fishType],
-                        type=fishType,
-                    )
-                )
-
-                self.timeEnemy = 0
+            if self.timeEnemy >= self.levelConfig["spawnInterval"]:
+                fishType = choiceTypeFish(game)
+                if fishType is not None:
+                    createEnemies(game, fishType)
+                    self.timeEnemy = 0
 
             self.camera.update()
             self.growth.update()
@@ -141,7 +114,7 @@ class Game:
                 enemy.update()
 
                 if enemy.alive:
-                    self.spawnParticle(enemy)
+                    spawnParticle(self, enemy, self.particles)
                     enemy.draw()
                 else:
                     self.enemies.remove(enemy)
@@ -169,101 +142,15 @@ class Game:
             self.score.draw()
             self.resultScreen.draw()
             pygame.display.flip()
+            if config.DEBUG:
+                print(self.clock.get_fps())
             self.clock.tick(config.FRAME_RATE)
 
         pygame.quit()
 
-    def spawnParticle(self, entity):
-        rect = entity.get_rect()
-
-        if entity.flip:
-            pos = (
-                rect.right,
-                rect.centery
-                + random.randint(
-                    -config.PARTICLE_OFFSET_Y,
-                    config.PARTICLE_OFFSET_Y,
-                ),
-            )
-            speed = [
-                random.uniform(
-                    config.PARTICLE_SPEED_MIN,
-                    config.PARTICLE_SPEED_MAX,
-                ),
-                random.uniform(
-                    -config.PARTICLE_VERTICAL_SPEED,
-                    config.PARTICLE_VERTICAL_SPEED,
-                ),
-            ]
-        else:
-            pos = (
-                rect.left,
-                rect.centery
-                + random.randint(
-                    -config.PARTICLE_OFFSET_Y,
-                    config.PARTICLE_OFFSET_Y,
-                ),
-            )
-            speed = [
-                -random.uniform(
-                    config.PARTICLE_SPEED_MIN,
-                    config.PARTICLE_SPEED_MAX,
-                ),
-                random.uniform(
-                    -config.PARTICLE_VERTICAL_SPEED,
-                    config.PARTICLE_VERTICAL_SPEED,
-                ),
-            ]
-
-        self.particles.append(
-            Particle(
-                self,
-                config.PARTICLE_COLOR,
-                random.randint(
-                    config.PARTICLE_MIN_SIZE,
-                    config.PARTICLE_MAX_SIZE,
-                ),
-                pos,
-                speed,
-            )
-        )
-
     def restart(self):
-        # Reset player
-        self.playerType = "small"
-        self.player = Player(
-            self,
-            self.loader[f"player/{self.playerType}/idle"],
-            config.PLAYER_START_POS,
-            config.PLAYER_LEVELS[self.playerType],
-            [10, 20, 30],
-        )
-
-        # Reset game state
-        self.win = False
-        self.reservationSet.clear()
-
-        # Remove old enemies and particles
-        self.enemies.clear()
-        self.particles.clear()
-
-        # Reset enemy spawning
-        self.timeEnemy = 0
-
-        # Reset UI components
-        self.growth = Growth(
-            self,
-            3,
-            [
-                self.ui_loader["growthBar/normalFish"],
-                self.ui_loader["growthBar/swordFish"],
-                self.ui_loader["growthBar/win"],
-            ],
-        )
-
-        self.score = Score(self)
-        self.resultScreen = ResultScreen(self, ["score", "numberOfEating"])
-
+        self.timeEnemy = 0.0
+        self.loadLevel()
         print("Game restarted!")
 
 

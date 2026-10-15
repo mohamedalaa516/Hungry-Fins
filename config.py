@@ -14,14 +14,12 @@ PLAYER_START_POS = (100, -100)
 PLAYER_SPEED = 2
 PLAYER_ANIMATION_SIZE = 4
 PLAYER_LEVELS = {"small": 1, "medium": 2, "large": 3}
+PLAYER_TYPE = "small"
 
 # Enemies
 ENEMY_SPAWN_Y_MAX = 250
 ENEMY_SPAWN_X_OFFSET = 0
 
-SMALL_FISH_WEIGHT = 65
-NORMAL_FISH_WEIGHT = 25
-LARGE_FISH_WEIGHT = 10
 
 FISH_LEVELS = {"smallFish": 1, "normalFish": 2, "swordFish": 3}
 FISH_POINTS = {"smallFish": 5, "normalFish": 10, "swordFish": 20}

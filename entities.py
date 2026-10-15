@@ -202,6 +202,7 @@ class Player(EntityPhysics):
         self.coolDown = 100
         self.time = 0.0
         self.score = 0
+        self.playerType = config.PLAYER_TYPE
 
     def makeWhite(self, surface):
         white = surface.copy()
@@ -223,7 +224,7 @@ class Player(EntityPhysics):
             self.startGame = True
             self.time = 0
             self.numberOfEating = 8
-            self.game.playerType = "small"
+            self.playerType = config.PLAYER_TYPE
             self.level = 1
 
             self.pos = list(config.PLAYER_START_POS)
@@ -231,7 +232,7 @@ class Player(EntityPhysics):
 
             self.animation.restart()
             self.animation.setAnimation(
-                self.game.loader[f"player/{self.game.playerType}/idle"], loop=True
+                self.game.loader[f"player/{self.playerType}/idle"], loop=True
             )
 
     def handleInput(self):
@@ -267,13 +268,13 @@ class Player(EntityPhysics):
             return
         if self.attack:
             self.animation.setAnimation(
-                self.game.loader[f"player/{self.game.playerType}/attack"], loop=False
+                self.game.loader[f"player/{self.playerType}/attack"], loop=False
             )
             if self.animation.finished:
                 self.attack = False
         else:
             self.animation.setAnimation(
-                self.game.loader[f"player/{self.game.playerType}/idle"], loop=True
+                self.game.loader[f"player/{self.playerType}/idle"], loop=True
             )
 
     def attackEnemy(self):
@@ -294,10 +295,10 @@ class Player(EntityPhysics):
 
     def changeSize(self):
         if self.numberOfEating >= self.sizeToGrow[0]:
-            self.game.playerType = "medium"
+            self.playerType = "medium"
             self.level = 2
         if self.numberOfEating >= self.sizeToGrow[1]:
-            self.game.playerType = "large"
+            self.playerType = "large"
             self.level = 3
         if self.numberOfEating >= self.sizeToGrow[2]:
             self.game.win = True
