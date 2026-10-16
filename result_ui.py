@@ -9,7 +9,6 @@ class ResultScreen:
         self.game = game
         self.visible = False
         self.items = items
-
         self.overlay = pygame.Surface(
             self.game.screen.get_size(),
             pygame.SRCALPHA,
@@ -19,20 +18,15 @@ class ResultScreen:
         self.fontMinSize = 34
         self.fontSize = 120
         self.currentItemIndex = 0
-
-        self.fontString = pygame.font.Font(
+        self.fontStatic = pygame.font.Font(
             join("assets", "Fonts", "yoster.ttf"), self.fontMinSize
         )
-        self.fontNumber = pygame.font.Font(
+        self.fontDynamic = pygame.font.Font(
             join("assets", "Fonts", "yoster.ttf"), self.fontSize
         )
-
         self.text_color = (46, 34, 47)
-        self.result_image = scaleImage(self.game.ui_loader["result"], scale=3)
-        self.component_image = scaleImage(
-            self.game.ui_loader["result/component"], scale=3
-        )
 
+        self.result_image = scaleImage(self.game.ui_loader["result"], scale=3)
         self.resultX = (
             self.game.screen.get_width() - self.result_image.get_width()
         ) // 2
@@ -42,7 +36,12 @@ class ResultScreen:
         self.result_rect = self.result_image.get_rect(
             topleft=(self.resultX, self.resultY)
         )
-        self.button = Button(
+
+        self.component_image = scaleImage(
+            self.game.ui_loader["result/component"], scale=3
+        )
+
+        self.retryButton = Button(
             self.game.screen,
             self.game.ui_loader["button/small"],
             self.game.ui_loader["button/small/clicked"],
@@ -51,6 +50,7 @@ class ResultScreen:
             "bottomleft",
             [15, -55],
         )
+        self.nextButton = None
         self.buttonPressed = False
 
     def update(self):
@@ -62,38 +62,55 @@ class ResultScreen:
                 self.currentItemIndex = min(self.currentItemIndex + 1, len(self.items))
                 if self.currentItemIndex <= len(self.items) - 1:
                     self.fontSize = 100
-            self.fontNumber = pygame.font.Font(
+            self.fontDynamic = pygame.font.Font(
                 join("assets", "Fonts", "yoster.ttf"), self.fontSize
             )
+
+            if self.game.win and self.game.hasNextLevel() and self.nextButton is None:
+                self.nextButton = Button(
+                    self.game.screen,
+                    self.game.ui_loader["button/small"],
+                    self.game.ui_loader["button/small/clicked"],
+                    "next",
+                    self.result_rect,
+                    "bottomright",
+                    [-40, -55],
+                )
 
     def handleInput(self, event):
         if not self.visible:
             return
-        if self.button.handle_input(event):
+        if self.retryButton.handle_input(event):
             print("Retry action!")
             self.game.restart()
+
+        if self.nextButton and self.nextButton.handle_input(event):
+            print("Next action !")
+            self.game.nextLevel()
 
     def draw(self):
         if not self.visible:
             return
 
         self.game.screen.blit(self.result_image, self.result_rect)
-        self.button.draw()
+        self.retryButton.draw()
+        if self.nextButton:
+            self.nextButton.draw()
         for i, item in enumerate(self.items):
             if i > self.currentItemIndex:
                 continue
             if item != "numberOfEating":
-                itemText = self.fontString.render(item, True, self.text_color)
+                itemText = self.fontStatic.render(item, True, self.text_color)
             else:
-                itemText = self.fontString.render("fishEaten", True, self.text_color)
+                itemText = self.fontStatic.render("fishEaten", True, self.text_color)
             self.value = getattr(self.game.player, item)
 
             if i == self.currentItemIndex:
-                itemNumber = self.fontNumber.render(
+                itemNumber = self.fontDynamic.render(
                     str(self.value), True, self.text_color
                 )
             else:
-                itemNumber = self.fontString.render(
+                itemNumber = self.fontStatic.render(
                     str(self.value), True, self.text_color
                 )
             componentX = self.resultX + 30

@@ -2,7 +2,7 @@ import json
 from main_ui import MainMenu
 import pygame
 import config
-from os.path import join
+from os.path import exists, join
 from entities import Player
 from utilities import transition
 from utilities.camera import Camera
@@ -27,51 +27,18 @@ class Game:
         self.loader = loaderTexture.loader
         self.ui_loader = loaderTexture.ui_loader
 
+        self.currentLevel = 1
         # load levels json
-        with open(join("levels", "level2.json"), "r") as file:
-            self.levelConfig = json.load(file)
+        try:
+            with open(join("levels", f"level{self.currentLevel}.json"), "r") as file:
+                self.levelConfig = json.load(file)
+        except FileNotFoundError:
+            print("level not found")
+            return
         self.loadLevel()
         self.timeEnemy = 0.0
 
         self.transition = Transition(self.gameScreen, 0, backWord=True, upWord=False)
-
-    def loadLevel(self):
-        self.player = Player(
-            self,
-            self.loader[f"player/{config.PLAYER_TYPE}/idle"],
-            config.PLAYER_START_POS,
-            config.PLAYER_LEVELS[config.PLAYER_TYPE],
-            self.levelConfig["growthMeter"],
-        )
-        self.win = False
-        self.reservationSet = set()
-        self.enemies = []
-
-        self.particles = []
-
-        self.camera = Camera(
-            config.GAME_WIDTH // config.CAMERA_ZOOM,
-            config.GAME_HEIGHT // config.CAMERA_ZOOM,
-            self,
-        )
-        self.tilesMap = Tiles(self)
-        self.growth = Growth(
-            self,
-            self.levelConfig["growthInterval"],
-            [
-                self.ui_loader[f"growthBar/{self.levelConfig['typeEnemies'][1]}"],
-                self.ui_loader[f"growthBar/{self.levelConfig['typeEnemies'][2]}"],
-                self.ui_loader["growthBar/win"],
-            ],
-        )
-        self.score = Score(self)
-        self.resultScreen = ResultScreen(self, ["score", "numberOfEating"])
-
-        try:
-            self.tilesMap.load()
-            print("File loaded successfully")
-        except FileNotFoundError:
-            print("File not found")
 
     def run(self):
         while self.running:
@@ -149,10 +116,65 @@ class Game:
 
         pygame.quit()
 
+    def loadLevel(self):
+        self.player = Player(
+            self,
+            self.loader[f"player/{config.PLAYER_TYPE}/idle"],
+            config.PLAYER_START_POS,
+            config.PLAYER_LEVELS[config.PLAYER_TYPE],
+            self.levelConfig["growthMeter"],
+        )
+        self.win = False
+        self.reservationSet = set()
+        self.enemies = []
+
+        self.particles = []
+
+        self.camera = Camera(
+            config.GAME_WIDTH // config.CAMERA_ZOOM,
+            config.GAME_HEIGHT // config.CAMERA_ZOOM,
+            self,
+        )
+        self.tilesMap = Tiles(self)
+        self.growth = Growth(
+            self,
+            self.levelConfig["growthInterval"],
+            [
+                self.ui_loader[f"growthBar/{self.levelConfig['typeEnemies'][1]}"],
+                self.ui_loader[f"growthBar/{self.levelConfig['typeEnemies'][2]}"],
+                self.ui_loader["growthBar/win"],
+            ],
+        )
+        self.score = Score(self)
+        self.resultScreen = ResultScreen(self, ["score", "numberOfEating"])
+
+        try:
+            self.tilesMap.load()
+            print("File loaded successfully")
+        except FileNotFoundError:
+            print("File not found")
+
     def restart(self):
         self.timeEnemy = 0.0
         self.loadLevel()
         print("Game restarted!")
+
+    def nextLevel(self):
+        self.currentLevel += 1
+        try:
+            with open(join("levels", f"level{self.currentLevel}.json"), "r") as file:
+                self.levelConfig = json.load(file)
+        except FileNotFoundError:
+            print("level not found")
+            return
+        self.loadLevel()
+        self.timeEnemy = 0.0
+
+        self.transition = Transition(self.gameScreen, 0, backWord=True, upWord=False)
+
+    def hasNextLevel(self):
+        nextLevelPath = join("levels", f"level{self.currentLevel + 1}")
+        return exists(nextLevelPath)
 
 
 if __name__ == "__main__":
