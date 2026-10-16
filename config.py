@@ -47,4 +47,4 @@ PARTICLE_VERTICAL_SPEED = 0.5
 CAMERA_ZOOM = 1.5
 
 # debugger
-DEBUG = True
+DEBUG = False

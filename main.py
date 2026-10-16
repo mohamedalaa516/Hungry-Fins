@@ -4,6 +4,7 @@ import pygame
 import config
 from os.path import join
 from entities import Player
+from utilities import transition
 from utilities.camera import Camera
 from tilemap import Tiles
 from growth_ui import Growth
@@ -11,6 +12,7 @@ from score_ui import Score
 from result_ui import ResultScreen
 from spawners.enemy_spawaner import createEnemies, choiceTypeFish
 from spawners.particle_spawaner import spawnParticle
+from utilities.transition import Transition
 
 
 class Game:
@@ -30,6 +32,8 @@ class Game:
             self.levelConfig = json.load(file)
         self.loadLevel()
         self.timeEnemy = 0.0
+
+        self.transition = Transition(self.gameScreen, 0, backWord=True, upWord=False)
 
     def loadLevel(self):
         self.player = Player(
@@ -88,6 +92,7 @@ class Game:
                     createEnemies(self, fishType)
                     self.timeEnemy = 0
 
+            self.transition.update()
             self.camera.update()
             self.growth.update()
             self.score.update()
@@ -103,6 +108,7 @@ class Game:
                 (0, 0),
             )
 
+            self.transition.draw()
             self.player.draw()
 
             for enemy in self.enemies[:]:
