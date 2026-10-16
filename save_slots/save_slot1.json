@@ -1,8 +1,9 @@
 {
-    "id": 0,
-    "currentLevel": 1,
+    "id": 1,
+    "currentLevel": 2,
     "completedLevels": 0,
-    "score": 0,
-    "playTime": 0,
-    "completion": 0
+    "score": 80,
+    "playTime": 66,
+    "playTimeFormat": "00:01:66",
+    "completion": 100.0
 }

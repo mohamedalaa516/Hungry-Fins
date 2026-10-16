@@ -17,8 +17,9 @@ from utilities.transition import Transition
 
 
 class Game:
-    def __init__(self, screen) -> None:
+    def __init__(self, screen, currentSlot) -> None:
         self.screen = screen
+        self.currentSlot = currentSlot
         self.gameScreen = pygame.Surface((config.GAME_WIDTH, config.GAME_HEIGHT))
         self.clock = pygame.time.Clock()
         self.running = True
@@ -28,7 +29,8 @@ class Game:
         self.loader = loaderTexture.loader
         self.ui_loader = loaderTexture.ui_loader
 
-        self.currentLevel = 1
+        self.loadSlots()
+        self.sessionStartTime = pygame.time.get_ticks()
         # load levels json
         try:
             with open(join("levels", f"level{self.currentLevel}.json"), "r") as file:
@@ -37,6 +39,7 @@ class Game:
             print("level not found")
             return
         self.loadLevel()
+        self.player.score = self.currentScore
         self.timeEnemy = 0.0
 
         self.transition = Transition(self.gameScreen, 0, backWord=True, upWord=False)
@@ -78,7 +81,6 @@ class Game:
 
             self.transition.draw()
             self.player.draw()
-
             for enemy in self.enemies[:]:
                 enemy.update()
 
@@ -117,6 +119,54 @@ class Game:
 
         pygame.quit()
 
+    def getPlayTime(self):
+        currentSession = (pygame.time.get_ticks() - self.sessionStartTime) // 1000
+
+        return self.playTime + currentSession
+
+    def formatPlayTime(self, seconds):
+        hours = seconds // 3600
+        minutes = (seconds % 3600) // 60
+
+        return f"{hours:02}:{minutes:02}:{seconds:02}"
+
+    def get_completion(self, totalLevel, currentLevel):
+        return (currentLevel / totalLevel) * 100
+
+    def loadSlots(self):
+        try:
+            with open(
+                join("save_slots", f"save_slot{self.currentSlot}.json"), "r"
+            ) as file:
+                slot = json.load(file)
+
+            self.currentLevel = slot.get("currentLevel", 1)
+            self.currentScore = slot.get("score", 0)
+            self.completedLevels = slot.get("completedLevels", 0)
+            self.playTime = slot.get("playTime", 0)
+
+        except FileNotFoundError:
+            print("slot not found")
+            self.currentLevel = 1
+            self.currentScore = 0
+            self.completedLevels = 0
+            self.playTime = 0
+            self.completion = 0
+
+    def saveSlots(self):
+        data = {
+            "id": self.currentSlot,
+            "currentLevel": self.currentLevel,
+            "completedLevels": self.completedLevels,
+            "score": self.player.score,
+            "playTime": self.getPlayTime(),
+            "playTimeFormat": self.formatPlayTime(self.getPlayTime()),
+            "completion": self.get_completion(2, self.currentLevel),
+        }
+
+        with open(join("save_slots", f"save_slot{self.currentSlot}.json"), "w") as file:
+            json.dump(data, file, indent=4)
+
     def loadLevel(self):
         self.player = Player(
             self,
@@ -125,6 +175,8 @@ class Game:
             config.PLAYER_LEVELS[config.PLAYER_TYPE],
             self.levelConfig["growthMeter"],
         )
+        self.player.score = self.currentScore
+        print(self.player.score, self.currentScore)
         self.win = False
         self.reservationSet = set()
         self.enemies = []
@@ -161,17 +213,33 @@ class Game:
         print("Game restarted!")
 
     def nextLevel(self):
-        self.currentLevel += 1
+        currentScore = self.player.score
+
+        nextLevel = self.currentLevel + 1
+        nextLevelPath = join("levels", f"level{nextLevel}.json")
+
         try:
-            with open(join("levels", f"level{self.currentLevel}.json"), "r") as file:
-                self.levelConfig = json.load(file)
+            with open(nextLevelPath, "r") as file:
+                nextLevelConfig = json.load(file)
         except FileNotFoundError:
             print("level not found")
             return
+
+        self.currentLevel = nextLevel
+        self.levelConfig = nextLevelConfig
+        self.currentScore = currentScore
+
         self.loadLevel()
         self.timeEnemy = 0.0
 
-        self.transition = Transition(self.gameScreen, 0, backWord=True, upWord=False)
+        self.transition = Transition(
+            self.gameScreen,
+            0,
+            backWord=True,
+            upWord=False,
+        )
+
+        self.saveSlots()
 
     def hasNextLevel(self):
         nextLevelPath = join("levels", f"level{self.currentLevel + 1}.json")
@@ -189,4 +257,4 @@ if __name__ == "__main__":
         saveslots = SaveSlots(screen)
         saveslots.run()
         if saveslots.nextScreen == "Game":
-            Game(screen).run()
+            Game(screen, saveslots.currentSlot).run()

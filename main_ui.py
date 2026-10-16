@@ -39,7 +39,7 @@ class MainMenu:
         self.titleClicked = False
         self.startGame = False
 
-        self.transition = Transition(self.gameScreen, 300)
+        self.transition = Transition(self.gameScreen, 320)
 
     def run(self):
         while self.running:

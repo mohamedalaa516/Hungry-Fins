@@ -126,5 +126,11 @@ class CustomButton(Button):
     def draw(self):
         super().draw()
 
+        self.extraTexts = [
+            (self.number, "topleft", (10, 10)),
+            (self.playTime, "bottomleft", (10, -10)),
+            (self.completion, "bottomright", (-10, -10)),
+        ]
+
         for text, anchor, offset in self.extraTexts:
             self.drawExtraText(text, anchor, offset)
