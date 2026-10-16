@@ -1,5 +1,6 @@
 import json
 from main_ui import MainMenu
+from save_ui import SaveSlots
 import pygame
 import config
 from os.path import exists, join
@@ -173,7 +174,7 @@ class Game:
         self.transition = Transition(self.gameScreen, 0, backWord=True, upWord=False)
 
     def hasNextLevel(self):
-        nextLevelPath = join("levels", f"level{self.currentLevel + 1}")
+        nextLevelPath = join("levels", f"level{self.currentLevel + 1}.json")
         return exists(nextLevelPath)
 
 
@@ -184,5 +185,8 @@ if __name__ == "__main__":
     menu = MainMenu(screen)
     menu.run()
 
-    if menu.startGame:
-        Game(screen).run()
+    if menu.nextScreen == "save_slots":
+        saveslots = SaveSlots(screen)
+        saveslots.run()
+        if saveslots.nextScreen == "Game":
+            Game(screen).run()

@@ -5,18 +5,30 @@ from utilities.ui_helper import scaleImage
 
 class Button:
     def __init__(
-        self, screen, surface, clickedSurface, text, parent_rect, anchor, offset
+        self,
+        screen,
+        surface,
+        clickedSurface,
+        text,
+        parent_rect,
+        anchor,
+        offset,
+        scale=3,
+        fontSize=34,
+        color=(247, 150, 23),
     ):
         self.screen = screen
-        self.clickedSurface = scaleImage(clickedSurface, scale=3)
-        self.mainSurface = scaleImage(surface, scale=3)
+        self.scale = scale
+        self.clickedSurface = scaleImage(clickedSurface, scale=scale)
+        self.mainSurface = scaleImage(surface, scale=scale)
         self.surface = self.mainSurface
         self.text = text
         self.parent_rect = parent_rect
         self.anchor = anchor
 
-        self.color = (247, 150, 23)
-        self.font = pygame.font.Font(join("assets", "Fonts", "yoster.ttf"), 34)
+        self.color = color
+        self.fontSize = fontSize
+        self.font = pygame.font.Font(join("assets", "Fonts", "yoster.ttf"), fontSize)
         self.render_text = self.font.render(self.text, True, self.color)
 
         self.rect = self.surface.get_rect()
@@ -53,3 +65,66 @@ class Button:
 
         self.screen.blit(self.surface, self.rect)
         self.screen.blit(self.render_text, text_rect)
+
+
+class CustomButton(Button):
+    def __init__(
+        self,
+        screen,
+        surface,
+        clickedSurface,
+        text,
+        parent_rect,
+        anchor,
+        offset,
+        number,
+        playTime,
+        completion,
+        scale=3,
+        fontSize=34,
+        color=(247, 150, 23),
+    ):
+        super().__init__(
+            screen,
+            surface,
+            clickedSurface,
+            text,
+            parent_rect,
+            anchor,
+            offset,
+            scale,
+            fontSize,
+            color,
+        )
+
+        self.font = pygame.font.Font(None, fontSize)
+        self.number = str(number)
+        self.playTime = str(playTime)
+        self.completion = str(completion)
+
+        self.extraTexts = [
+            (self.number, "topleft", (10, 10)),
+            (self.playTime, "bottomleft", (10, -10)),
+            (self.completion, "bottomright", (-10, -10)),
+        ]
+
+    def drawExtraText(self, text, anchor, offset):
+        renderedText = self.font.render(text, True, self.color)
+
+        textRect = renderedText.get_rect()
+        setattr(
+            textRect,
+            anchor,
+            (
+                getattr(self.rect, anchor)[0] + offset[0],
+                getattr(self.rect, anchor)[1] + offset[1],
+            ),
+        )
+
+        self.screen.blit(renderedText, textRect)
+
+    def draw(self):
+        super().draw()
+
+        for text, anchor, offset in self.extraTexts:
+            self.drawExtraText(text, anchor, offset)

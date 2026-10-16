@@ -89,4 +89,8 @@ ui_loader = {
     "mainUi/title/click": sprite_handler(
         join("assets", "Ui", "main_title_click.png"), 6
     ),
+    "buttonSave": pygame.image.load(join("assets", "Ui", "buttonSave.png")),
+    "buttonSave2": pygame.image.load(join("assets", "Ui", "buttonSave2.png")),
+    "buttonSave/idle": pygame.image.load(join("assets", "Ui", "buttonSave_idle.png")),
+    "buttonSave/click": pygame.image.load(join("assets", "Ui", "buttonSave_click.png")),
 }

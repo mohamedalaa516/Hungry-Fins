@@ -194,7 +194,7 @@ class Player(EntityPhysics):
         self.dir = {"left": False, "right": False, "up": False, "down": False}
         self.startGame = True
         self.attack = False
-        self.numberOfEating = 5
+        self.numberOfEating = 28
         self.sizeToGrow = sizeToGrow
         self.tempVolicity = self.volicity
         self.alive = True

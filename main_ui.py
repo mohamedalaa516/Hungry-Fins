@@ -11,6 +11,7 @@ class MainMenu:
         self.screen = screen
         self.clock = pygame.time.Clock()
         self.running = True
+        self.nextScreen = None
 
         from loaderTexture import ui_loader
 
@@ -102,5 +103,5 @@ class MainMenu:
             and self.transition.radius <= 0
             and self.titleClicked
         ):
-            self.startGame = True
+            self.nextScreen = "save_slots"
             self.running = False
