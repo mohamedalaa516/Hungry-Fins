@@ -24,7 +24,7 @@ ENEMY_SPAWN_X_OFFSET = 0
 FISH_LEVELS = {"smallFish": 1, "normalFish": 2, "swordFish": 3}
 FISH_POINTS = {"smallFish": 5, "normalFish": 10, "swordFish": 20}
 FISH_SPEED = {"smallFish": 1, "normalFish": 0.6, "swordFish": 0.4}
-FISH_ESCAPED = {"smallFish": 2, "normalFish": 0.9, "swordFish": 0.7}
+FISH_ESCAPED = {"smallFish": 1.5, "normalFish": 0.9, "swordFish": 0.7}
 
 ENEMY_SPEED = 1
 ENEMY_ANIMATION_SIZE = 4

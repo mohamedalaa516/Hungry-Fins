@@ -14,7 +14,11 @@ class MainMenu:
         self.nextScreen = None
 
         from loaderTexture import ui_loader
+        import loaderMusic
 
+        loaderMusic.load()
+
+        self.music_loader = loaderMusic
         self.ui_loader = ui_loader
         # layer 1 image
         self.imageLayer1 = self.ui_loader["mainUi/layer1"]
@@ -40,6 +44,10 @@ class MainMenu:
         self.startGame = False
 
         self.transition = Transition(self.gameScreen, 320)
+        self.background_sound = self.music_loader.sound["mainMenu"]
+        self.background_sound.play(loops=True)
+
+        self.start = self.music_loader.sfx["start"]
 
     def run(self):
         while self.running:
@@ -49,6 +57,7 @@ class MainMenu:
 
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN and not self.titleClicked:
+                        self.start.play()
                         self.titleClicked = True
                         self.animationTitle = Animation(
                             1, self.ui_loader["mainUi/title/click"], 0.2, loop=False
@@ -105,3 +114,4 @@ class MainMenu:
         ):
             self.nextScreen = "save_slots"
             self.running = False
+            self.background_sound.stop()

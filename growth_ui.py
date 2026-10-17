@@ -44,6 +44,7 @@ class Growth:
         progress = self.game.ui_loader["growthBar/progress"]
         scaledBar = scaleImage(bar)
         scaledProgress = scaleImage(progress)
+        progressFull = scaleImage(self.game.ui_loader["growthBar/progress/full"])
         scaledFishs = [scaleImage(fish) for fish in self.fishs]
 
         for i in range(self.numberOfBars):
@@ -69,8 +70,11 @@ class Growth:
                     + scaledProgress.get_height()
                     - progressHeight
                 )
+                if self.progressMap[i] != 1:
+                    self.game.screen.blit(croppedProgress, (progressX, progressY))
+                else:
+                    self.game.screen.blit(progressFull, (progressX, progressY))
 
-                self.game.screen.blit(croppedProgress, (progressX, progressY))
             fishX = self.posImageRlationToBar(x, scaledBar, scaledFishs[i])
             fishY = self.posImageRlationToBar(
                 x, scaledBar, scaledFishs[i], x=False, y=True

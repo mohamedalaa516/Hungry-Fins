@@ -16,6 +16,10 @@ loader = {
         join("./assets", "player", "player_medium_attack.png"),
         config.PLAYER_ANIMATION_SIZE,
     ),
+    "player/medium/powerUp": sprite_handler(
+        join("./assets", "player", "player_medium_powerUp.png"),
+        config.PLAYER_ANIMATION_SIZE,
+    ),
     "player/small/idle": sprite_handler(
         join("./assets", "player", "player_small_idle.png"),
         config.PLAYER_ANIMATION_SIZE,
@@ -30,6 +34,10 @@ loader = {
     ),
     "player/large/attack": sprite_handler(
         join("./assets", "player", "player_large_attack.png"),
+        config.PLAYER_ANIMATION_SIZE,
+    ),
+    "player/large/powerUp": sprite_handler(
+        join("./assets", "player", "player_large_powerUp.png"),
         config.PLAYER_ANIMATION_SIZE,
     ),
     "normalFish/idle": sprite_handler(
@@ -58,6 +66,9 @@ ui_loader = {
     "growthBar": pygame.image.load(join("assets", "Ui", "growthBar_empty.png")),
     "growthBar/progress": pygame.image.load(
         join("assets", "Ui", "growthBar_progress.png")
+    ),
+    "growthBar/progress/full": pygame.image.load(
+        join("assets", "Ui", "growthBar_progress_full.png")
     ),
     "growthBar/normalFish": pygame.image.load(
         join("assets", "Ui", "growthBar_NormalFish.png")
@@ -93,4 +104,6 @@ ui_loader = {
     "buttonSave2": pygame.image.load(join("assets", "Ui", "buttonSave2.png")),
     "buttonSave/idle": pygame.image.load(join("assets", "Ui", "buttonSave_idle.png")),
     "buttonSave/click": pygame.image.load(join("assets", "Ui", "buttonSave_click.png")),
+    "double": pygame.image.load(join("assets", "Ui", "double.png")),
+    "triple": pygame.image.load(join("assets", "Ui", "triple.png")),
 }

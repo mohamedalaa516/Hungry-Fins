@@ -25,9 +25,13 @@ class Game:
         self.running = True
 
         import loaderTexture
+        import loaderMusic
+
+        loaderMusic.load()
 
         self.loader = loaderTexture.loader
         self.ui_loader = loaderTexture.ui_loader
+        self.music_loader = loaderMusic
 
         self.loadSlots()
         self.sessionStartTime = pygame.time.get_ticks()
@@ -69,6 +73,7 @@ class Game:
             self.score.update()
             if self.win or self.player.health <= 0:
                 self.resultScreen.visible = True
+                self.backgroundMusic.stop()
             else:
                 self.player.update()
 
@@ -131,7 +136,7 @@ class Game:
         return f"{hours:02}:{minutes:02}:{seconds:02}"
 
     def get_completion(self, totalLevel, currentLevel):
-        return (currentLevel / totalLevel) * 100
+        return ((currentLevel - 1) / totalLevel) * 100
 
     def loadSlots(self):
         try:
@@ -200,6 +205,8 @@ class Game:
         )
         self.score = Score(self)
         self.resultScreen = ResultScreen(self, ["score", "numberOfEating"])
+        self.backgroundMusic = self.music_loader.sound["chapter1"]
+        self.backgroundMusic.play(loops=True)
 
         try:
             self.tilesMap.load()

@@ -1,4 +1,5 @@
 import pygame
+import loaderMusic
 from os.path import join
 from utilities.ui_helper import scaleImage
 
@@ -17,6 +18,9 @@ class Button:
         fontSize=34,
         color=(247, 150, 23),
     ):
+
+        self.music_loader = loaderMusic
+        self.confirmClick = self.music_loader.sfx["confirm"]
         self.screen = screen
         self.scale = scale
         self.clickedSurface = scaleImage(clickedSurface, scale=scale)
@@ -38,6 +42,7 @@ class Button:
     def handle_input(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(event.pos) and event.button == pygame.BUTTON_LEFT:
+                self.confirmClick.play()
                 self.pressed = True
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == pygame.BUTTON_LEFT:
