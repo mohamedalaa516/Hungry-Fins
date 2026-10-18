@@ -1,7 +1,8 @@
 import pygame
 import loaderMusic
-from os.path import join
+
 from utilities.ui_helper import scaleImage
+from paths import resource_path
 
 
 class Button:
@@ -18,21 +19,25 @@ class Button:
         fontSize=34,
         color=(247, 150, 23),
     ):
-
         self.music_loader = loaderMusic
         self.confirmClick = self.music_loader.sfx["confirm"]
+
         self.screen = screen
         self.scale = scale
         self.clickedSurface = scaleImage(clickedSurface, scale=scale)
         self.mainSurface = scaleImage(surface, scale=scale)
         self.surface = self.mainSurface
+
         self.text = text
         self.parent_rect = parent_rect
         self.anchor = anchor
-
         self.color = color
         self.fontSize = fontSize
-        self.font = pygame.font.Font(join("assets", "Fonts", "yoster.ttf"), fontSize)
+
+        self.font = pygame.font.Font(
+            str(resource_path("assets", "Fonts", "yoster.ttf")),
+            fontSize,
+        )
         self.render_text = self.font.render(self.text, True, self.color)
 
         self.rect = self.surface.get_rect()
@@ -44,13 +49,15 @@ class Button:
             if self.rect.collidepoint(event.pos) and event.button == pygame.BUTTON_LEFT:
                 self.confirmClick.play()
                 self.pressed = True
+
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == pygame.BUTTON_LEFT:
                 wasPressed = self.pressed
                 self.pressed = False
 
-            if wasPressed and self.rect.collidepoint(event.pos):
-                return True
+                if wasPressed and self.rect.collidepoint(event.pos):
+                    return True
+
         return False
 
     def draw(self):
@@ -66,6 +73,7 @@ class Button:
         )
 
         self.surface = self.clickedSurface if self.pressed else self.mainSurface
+
         text_rect = self.render_text.get_rect(center=self.rect.center)
 
         self.screen.blit(self.surface, self.rect)
@@ -103,8 +111,16 @@ class CustomButton(Button):
         )
 
         self.font = pygame.font.Font(
-            join("assets", "Fonts", "PressStart2P-Regular.ttf"), fontSize
+            str(
+                resource_path(
+                    "assets",
+                    "Fonts",
+                    "PressStart2P-Regular.ttf",
+                )
+            ),
+            fontSize,
         )
+
         self.number = str(number)
         self.playTime = str(playTime)
         self.completion = str(completion)
@@ -117,8 +133,8 @@ class CustomButton(Button):
 
     def drawExtraText(self, text, anchor, offset):
         renderedText = self.font.render(text, True, self.color)
-
         textRect = renderedText.get_rect()
+
         setattr(
             textRect,
             anchor,

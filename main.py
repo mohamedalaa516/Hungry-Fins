@@ -1,20 +1,33 @@
-from main_ui import MainMenu
-import json
-from save_ui import SaveSlots
-import pygame
-import config
-from os.path import exists, join
-from player import Player
-from utilities import transition
-from utilities.camera import Camera
-from tilemap import Tiles
-from growth_ui import Growth
-from score_ui import Score
-from result_ui import ResultScreen
-from spawners.enemy_spawaner import createEnemies, choiceTypeFish
-from spawners.particle_spawaner import spawnParticle
-from utilities.transition import Transition
+from paths import resource_path, save_path
 from utilities.ui_helper import scaleImage
+from utilities.transition import Transition
+from spawners.particle_spawaner import spawnParticle
+from spawners.enemy_spawaner import createEnemies, choiceTypeFish
+from result_ui import ResultScreen
+from score_ui import Score
+from growth_ui import Growth
+from tilemap import Tiles
+from utilities.camera import Camera
+from utilities import transition
+from player import Player
+import config
+import pygame
+from save_ui import SaveSlots
+import json
+from main_ui import MainMenu
+import sys
+import traceback
+from pathlib import Path
+
+
+def log_exception(exc_type, exc_value, exc_traceback):
+    log_path = Path.home() / "HungryFins_error.log"
+
+    with open(log_path, "w", encoding="utf-8") as file:
+        traceback.print_exception(exc_type, exc_value, exc_traceback, file=file)
+
+
+sys.excepthook = log_exception
 
 
 class Game:
@@ -37,30 +50,45 @@ class Game:
 
         self.loadSlots()
         self.sessionStartTime = pygame.time.get_ticks()
-        # load levels json
+
+        # Load level JSON
         try:
-            with open(join("levels", f"level{self.currentLevel}.json"), "r") as file:
+            with open(
+                resource_path("levels", f"level{self.currentLevel}.json"),
+                "r",
+                encoding="utf-8",
+            ) as file:
                 self.levelConfig = json.load(file)
+
         except FileNotFoundError:
             print("level not found")
             return
+
         self.loadLevel()
         self.player.score = self.currentScore
         self.timeEnemy = 0.0
 
-        self.transition = Transition(self.gameScreen, 0, backWord=True, upWord=False)
+        self.transition = Transition(
+            self.gameScreen,
+            0,
+            backWord=True,
+            upWord=False,
+        )
 
     def run(self):
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+
                 self.resultScreen.handleInput(event)
 
             if self.end:
                 self.endLevel()
                 return
+
             self.player.handleInput()
+
             if self.player.alive:
                 spawnParticle(self, self.player, self.particles)
 
@@ -68,6 +96,7 @@ class Game:
 
             if self.timeEnemy >= self.levelConfig["spawnInterval"]:
                 fishType = choiceTypeFish(self)
+
                 if fishType is not None:
                     createEnemies(self, fishType)
                     self.timeEnemy = 0
@@ -93,6 +122,7 @@ class Game:
 
             self.transition.draw()
             self.player.draw()
+
             for enemy in self.enemies[:]:
                 enemy.update()
 
@@ -111,8 +141,12 @@ class Game:
                     self.particles.remove(particle)
 
             view = self.gameScreen.subsurface(self.camera.camera)
+
             if self.resultScreen.visible:
-                self.gameScreen.blit(self.resultScreen.overlay, (0, 0))
+                self.gameScreen.blit(
+                    self.resultScreen.overlay,
+                    (0, 0),
+                )
 
             scaled = pygame.transform.scale(
                 view,
@@ -124,9 +158,12 @@ class Game:
             self.growth.draw()
             self.score.draw()
             self.resultScreen.draw()
+
             pygame.display.flip()
+
             if config.DEBUG:
                 print(self.clock.get_fps())
+
             self.clock.tick(config.FRAME_RATE)
 
         pygame.quit()
@@ -139,8 +176,9 @@ class Game:
     def formatPlayTime(self, seconds):
         hours = seconds // 3600
         minutes = (seconds % 3600) // 60
+        remainingSeconds = seconds % 60
 
-        return f"{hours:02}:{minutes:02}:{seconds:02}"
+        return f"{hours:02}:{minutes:02}:{remainingSeconds:02}"
 
     def get_completion(self, totalLevel, currentLevel):
         return ((currentLevel - 1) / totalLevel) * 100
@@ -148,7 +186,9 @@ class Game:
     def loadSlots(self):
         try:
             with open(
-                join("save_slots", f"save_slot{self.currentSlot}.json"), "r"
+                save_path(self.currentSlot),
+                "r",
+                encoding="utf-8",
             ) as file:
                 slot = json.load(file)
 
@@ -156,6 +196,7 @@ class Game:
             self.currentScore = slot.get("score", 0)
             self.completedLevels = slot.get("completedLevels", 0)
             self.playTime = slot.get("playTime", 0)
+            self.completion = slot.get("completion", 0)
 
         except FileNotFoundError:
             print("slot not found")
@@ -166,22 +207,29 @@ class Game:
             self.completion = 0
 
     def saveSlots(self):
+        playTime = self.getPlayTime()
+
         data = {
             "id": self.currentSlot,
             "currentLevel": self.currentLevel,
             "completedLevels": self.completedLevels,
             "score": self.player.score,
-            "playTime": self.getPlayTime(),
-            "playTimeFormat": self.formatPlayTime(self.getPlayTime()),
+            "playTime": playTime,
+            "playTimeFormat": self.formatPlayTime(playTime),
             "completion": self.get_completion(5, self.currentLevel),
         }
 
-        with open(join("save_slots", f"save_slot{self.currentSlot}.json"), "w") as file:
+        with open(
+            save_path(self.currentSlot),
+            "w",
+            encoding="utf-8",
+        ) as file:
             json.dump(data, file, indent=4)
 
     def loadLevel(self):
         if self.end:
             return
+
         self.player = Player(
             self,
             self.loader[f"player/{config.PLAYER_TYPE}/idle"],
@@ -189,12 +237,13 @@ class Game:
             config.PLAYER_LEVELS[config.PLAYER_TYPE],
             self.levelConfig["growthMeter"],
         )
+
         self.player.score = self.currentScore
         print(self.player.score, self.currentScore)
+
         self.win = False
         self.reservationSet = set()
         self.enemies = []
-
         self.particles = []
 
         self.camera = Camera(
@@ -202,7 +251,9 @@ class Game:
             config.GAME_HEIGHT // config.CAMERA_ZOOM,
             self,
         )
+
         self.tilesMap = Tiles(self)
+
         self.growth = Growth(
             self,
             self.levelConfig["growthInterval"],
@@ -212,8 +263,14 @@ class Game:
                 self.ui_loader["growthBar/win"],
             ],
         )
+
         self.score = Score(self)
-        self.resultScreen = ResultScreen(self, ["score", "numberOfEating"])
+
+        self.resultScreen = ResultScreen(
+            self,
+            ["score", "numberOfEating"],
+        )
+
         self.backgroundMusic = self.music_loader.sound["chapter1"]
         self.backgroundMusic.play(loops=True)
 
@@ -238,6 +295,7 @@ class Game:
         pygame.display.flip()
 
         waiting = True
+
         while waiting:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -247,17 +305,22 @@ class Game:
 
     def nextLevel(self):
         currentScore = self.player.score
-
         nextLevel = self.currentLevel + 1
+
         if nextLevel == 5:
             self.end = True
             return
 
-        nextLevelPath = join("levels", f"level{nextLevel}.json")
+        nextLevelPath = resource_path("levels", f"level{nextLevel}.json")
 
         try:
-            with open(nextLevelPath, "r") as file:
+            with open(
+                nextLevelPath,
+                "r",
+                encoding="utf-8",
+            ) as file:
                 nextLevelConfig = json.load(file)
+
         except FileNotFoundError:
             print("level not found")
             return
@@ -279,22 +342,39 @@ class Game:
         self.saveSlots()
 
     def hasNextLevel(self):
-        nextLevelPath = join("levels", f"level{self.currentLevel + 1}.json")
-        return exists(nextLevelPath)
+        nextLevelPath = resource_path(
+            "levels",
+            f"level{self.currentLevel + 1}.json",
+        )
+
+        return nextLevelPath.exists()
 
 
 if __name__ == "__main__":
     pygame.init()
     pygame.display.set_caption(config.WINDOW_TITLE)
+
     screen = pygame.display.set_mode(
         (config.SCREEN_WIDTH, config.SCREEN_HEIGHT),
         flags=pygame.FULLSCREEN | pygame.SCALED,
     )
+
+    print("1. Starting MainMenu")
     menu = MainMenu(screen)
     menu.run()
 
+    print("2. MainMenu closed:", menu.nextScreen)
+
     if menu.nextScreen == "save_slots":
+        print("3. Starting SaveSlots")
+
         saveslots = SaveSlots(screen)
         saveslots.run()
+
+        print("4. SaveSlots closed:", saveslots.nextScreen)
+
         if saveslots.nextScreen == "Game":
+            print("5. Starting Game")
             Game(screen, saveslots.currentSlot).run()
+
+    print("6. Program finished")

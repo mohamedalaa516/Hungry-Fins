@@ -1,11 +1,11 @@
-from os.path import exists, join
+from os.path import exists
 import json
 
 import pygame
 import config
 
 from utilities.button import Button, CustomButton
-from utilities.ui_helper import scaleImage
+from paths import save_path
 
 
 class SaveSlots:
@@ -21,7 +21,6 @@ class SaveSlots:
         from loaderTexture import ui_loader
 
         self.ui_loader = ui_loader
-
         self.saveButtonList = []
 
         button_height = self.ui_loader["buttonSave/idle"].get_height() * 2
@@ -30,15 +29,11 @@ class SaveSlots:
         start_y = (config.GAME_HEIGHT - total_height) // 2
 
         for i in range(3):
-            savePath = join(
-                "save_slots",
-                f"save_slot{i + 1}.json",
-            )
-
+            savePath = save_path(i + 1)
             y = start_y + i * (button_height + spacing)
 
             if exists(savePath):
-                with open(savePath, "r") as file:
+                with open(savePath, "r", encoding="utf-8") as file:
                     buttonData = json.load(file)
 
                 self.saveButtonList.append(
@@ -81,6 +76,7 @@ class SaveSlots:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                    continue
 
                 if event.type in (
                     pygame.MOUSEBUTTONDOWN,
@@ -96,12 +92,9 @@ class SaveSlots:
 
                 for index, slotButton in enumerate(self.saveButtonList):
                     if slotButton.handle_input(event):
-                        savePath = join(
-                            "save_slots",
-                            f"save_slot{index + 1}.json",
-                        )
+                        savePath = save_path(index + 1)
 
-                        # Create a file only for a new save slot.
+                        # Create a new save file if needed.
                         if not exists(savePath):
                             data = {
                                 "id": index + 1,
@@ -109,14 +102,13 @@ class SaveSlots:
                                 "completedLevels": 0,
                                 "score": 0,
                                 "playTime": 0,
-                                "playTimeFormat": 0,
+                                "playTimeFormat": "00:00:00",
                                 "completion": 0,
                             }
 
-                            with open(savePath, "w") as file:
+                            with open(savePath, "w", encoding="utf-8") as file:
                                 json.dump(data, file, indent=4)
 
-                            # Replace New Save with the save display.
                             self.saveButtonList[index] = CustomButton(
                                 self.gameScreen,
                                 self.ui_loader["buttonSave"],
@@ -136,6 +128,7 @@ class SaveSlots:
                         # Select the slot without resetting its data.
                         self.currentSlot = index + 1
                         self.titleClicked = True
+                        break
 
             self.gameScreen.fill((0, 0, 0))
 

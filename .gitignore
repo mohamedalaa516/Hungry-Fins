@@ -1,2 +1,9 @@
 __pycache__/
 save_slots/* 
+# Build output
+dist/
+build/
+
+# Python cache
+__pycache__/
+*.py[cod]
