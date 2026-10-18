@@ -49,7 +49,7 @@ class Player(EntityPhysics):
         self.doubleSpeed = False
 
         self.multiplierPoint = 1
-        self.multiplierPointTimer = 900
+        self.multiplierPointTimer = 300
         self.multiplierPointRange = 0
         self.multiplierPointCur = 0.0
         self.multiplierPointMax = 6

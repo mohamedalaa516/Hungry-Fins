@@ -5,6 +5,7 @@ import pygame
 
 loader = {
     "background": pygame.image.load(join("./assets", "decore", "background.png")),
+    "endLevel": pygame.image.load(join("./assets", "endLevel.png")),
     "blood": sprite_handler(
         join("./assets", "Bloodybite.png"), 4, column=False, row=True
     ),

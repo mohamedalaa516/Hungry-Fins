@@ -23,6 +23,7 @@ class Game:
         self.currentSlot = currentSlot
         self.gameScreen = pygame.Surface((config.GAME_WIDTH, config.GAME_HEIGHT))
         self.clock = pygame.time.Clock()
+        self.end = False
         self.running = True
 
         import loaderTexture
@@ -56,6 +57,9 @@ class Game:
                     self.running = False
                 self.resultScreen.handleInput(event)
 
+            if self.end:
+                self.endLevel()
+                return
             self.player.handleInput()
             if self.player.alive:
                 spawnParticle(self, self.player, self.particles)
@@ -72,6 +76,7 @@ class Game:
             self.camera.update()
             self.growth.update()
             self.score.update()
+
             if self.win or self.player.health <= 0:
                 self.resultScreen.visible = True
                 self.player.multiplierPointRange = 0
@@ -168,13 +173,15 @@ class Game:
             "score": self.player.score,
             "playTime": self.getPlayTime(),
             "playTimeFormat": self.formatPlayTime(self.getPlayTime()),
-            "completion": self.get_completion(2, self.currentLevel),
+            "completion": self.get_completion(5, self.currentLevel),
         }
 
         with open(join("save_slots", f"save_slot{self.currentSlot}.json"), "w") as file:
             json.dump(data, file, indent=4)
 
     def loadLevel(self):
+        if self.end:
+            return
         self.player = Player(
             self,
             self.loader[f"player/{config.PLAYER_TYPE}/idle"],
@@ -221,10 +228,31 @@ class Game:
         self.loadLevel()
         print("Game restarted!")
 
+    def endLevel(self):
+        endSurface = pygame.transform.scale(
+            self.loader["endLevel"],
+            self.screen.get_size(),
+        )
+
+        self.screen.blit(endSurface, (0, 0))
+        pygame.display.flip()
+
+        waiting = True
+        while waiting:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    waiting = False
+
+            self.clock.tick(config.FRAME_RATE)
+
     def nextLevel(self):
         currentScore = self.player.score
 
         nextLevel = self.currentLevel + 1
+        if nextLevel == 5:
+            self.end = True
+            return
+
         nextLevelPath = join("levels", f"level{nextLevel}.json")
 
         try:
