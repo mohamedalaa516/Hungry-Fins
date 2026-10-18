@@ -1,5 +1,5 @@
 import config
-from entities import Enemy
+from enemy import Enemy
 import random
 
 

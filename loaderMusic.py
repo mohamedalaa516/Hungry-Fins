@@ -35,6 +35,8 @@ def load():
                 join("assets", "music", "power_up_sfx_high.mp3")
             ),
             "growth": pygame.mixer.Sound(join("assets", "music", "growth.mp3")),
+            "2x": pygame.mixer.Sound(join("assets", "music", "2x.wav")),
+            "3x": pygame.mixer.Sound(join("assets", "music", "3x.wav")),
         }
     )
     sfx["die"].set_volume(0.25)

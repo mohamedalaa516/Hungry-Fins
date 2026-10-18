@@ -106,4 +106,8 @@ ui_loader = {
     "buttonSave/click": pygame.image.load(join("assets", "Ui", "buttonSave_click.png")),
     "double": pygame.image.load(join("assets", "Ui", "double.png")),
     "triple": pygame.image.load(join("assets", "Ui", "triple.png")),
+    "mouse": pygame.image.load(join("assets", "Ui", "mouse_cursor.png")),
+    "fins/1x": pygame.image.load(join("assets", "Ui", "fins_1x.png")),
+    "fins/2x": pygame.image.load(join("assets", "Ui", "fins_2x.png")),
+    "fins/3x": pygame.image.load(join("assets", "Ui", "fins_3x.png")),
 }

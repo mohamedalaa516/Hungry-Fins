@@ -1,10 +1,10 @@
-import json
 from main_ui import MainMenu
+import json
 from save_ui import SaveSlots
 import pygame
 import config
 from os.path import exists, join
-from entities import Player
+from player import Player
 from utilities import transition
 from utilities.camera import Camera
 from tilemap import Tiles
@@ -14,6 +14,7 @@ from result_ui import ResultScreen
 from spawners.enemy_spawaner import createEnemies, choiceTypeFish
 from spawners.particle_spawaner import spawnParticle
 from utilities.transition import Transition
+from utilities.ui_helper import scaleImage
 
 
 class Game:
@@ -73,6 +74,7 @@ class Game:
             self.score.update()
             if self.win or self.player.health <= 0:
                 self.resultScreen.visible = True
+                self.player.multiplierPointRange = 0
                 self.backgroundMusic.stop()
             else:
                 self.player.update()
@@ -256,7 +258,10 @@ class Game:
 if __name__ == "__main__":
     pygame.init()
     pygame.display.set_caption(config.WINDOW_TITLE)
-    screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
+    screen = pygame.display.set_mode(
+        (config.SCREEN_WIDTH, config.SCREEN_HEIGHT),
+        flags=pygame.FULLSCREEN | pygame.SCALED,
+    )
     menu = MainMenu(screen)
     menu.run()
 

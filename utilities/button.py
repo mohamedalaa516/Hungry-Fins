@@ -102,7 +102,9 @@ class CustomButton(Button):
             color,
         )
 
-        self.font = pygame.font.Font(None, fontSize)
+        self.font = pygame.font.Font(
+            join("assets", "Fonts", "PressStart2P-Regular.ttf"), fontSize
+        )
         self.number = str(number)
         self.playTime = str(playTime)
         self.completion = str(completion)

@@ -3,6 +3,7 @@ import config
 from utilities import animation
 from utilities.animation import Animation
 from utilities.transition import Transition
+from utilities.ui_helper import scaleImage
 
 
 class MainMenu:
@@ -48,6 +49,11 @@ class MainMenu:
         self.background_sound.play(loops=True)
 
         self.start = self.music_loader.sfx["start"]
+        pygame.mouse.set_cursor(self.changeMouse())
+
+    def changeMouse(self):
+        cursorSurface = scaleImage(self.ui_loader["mouse"], scale=3)
+        return pygame.cursors.Cursor((0, 0), cursorSurface)
 
     def run(self):
         while self.running:

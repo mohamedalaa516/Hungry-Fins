@@ -5,6 +5,7 @@ import pygame
 import config
 
 from utilities.button import Button, CustomButton
+from utilities.ui_helper import scaleImage
 
 
 class SaveSlots:
@@ -52,8 +53,9 @@ class SaveSlots:
                         f"{i + 1}.",
                         str(buttonData.get("playTimeFormat", 0)),
                         f"{buttonData.get('completion', 0)}%",
+                        color=(46, 34, 47),
                         scale=2,
-                        fontSize=24,
+                        fontSize=12,
                     )
                 )
 
@@ -126,8 +128,9 @@ class SaveSlots:
                                 f"{index + 1}.",
                                 str(data["playTimeFormat"]),
                                 f"{data['completion']}%",
+                                color=(46, 34, 47),
                                 scale=2,
-                                fontSize=24,
+                                fontSize=12,
                             )
 
                         # Select the slot without resetting its data.
