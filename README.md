@@ -32,6 +32,7 @@ Eat smaller fish, avoid larger predators, and grow as you make your way through 
 
 - Python 3.10+
 - `pygame-ce`
+- Pillow
 
 ### Setup
 
@@ -39,7 +40,7 @@ Eat smaller fish, avoid larger predators, and grow as you make your way through 
 git clone https://github.com/mohamedalaa516/Hungry-Fins.git
 cd Hungry-Fins
 
-python -m pip install pygame-ce
+python -m pip install pygame-ce Pillow
 python main.py
 ```
 
